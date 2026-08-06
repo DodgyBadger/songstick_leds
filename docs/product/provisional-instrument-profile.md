@@ -17,9 +17,9 @@ tests before changing any persisted song data derived from it.
    string.
 3. Frets are numbered 1–12 after the open position. Fret 3 is five semitones
    above open and therefore produces `D3 A3 D4` across the three strings.
-4. There is one RGB LED for each physical fret and no separate open-position
-   LED. Automatic teaching fingering therefore selects lit positions 1–12 and
-   does not select fret 0 for now.
+4. Open strings are logical fret 0 and may be selected by automatic fingering.
+   One shared RGB LED at or immediately behind the nut indicates open; its color
+   identifies the string. Frets 1–12 retain one RGB LED each.
 5. When a pitch has multiple positions, fingering minimizes fret movement first,
    then string changes, then lower fret number, with stable string order as the
    final tie-breaker.
@@ -32,7 +32,7 @@ tests before changing any persisted song data derived from it.
 
 - Confirm all three open-string octaves.
 - Confirm the exact number and pitch order of diatonic frets.
-- Confirm whether an open-position indicator exists or is required.
+- Confirm the open indicator's exact nut-adjacent placement and visibility.
 - Measure the final scale length and fret distances.
 - Record strip direction, first physical LED, density, and controller.
 - Confirm whether fret numbering and physical LED indexes increase in the same

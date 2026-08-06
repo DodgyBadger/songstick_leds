@@ -73,7 +73,7 @@ WebLedOutput web_output(const songstick::LedOutput& output) {
 emscripten::val import_snapshot(const songstick::ImportResult& result) {
     auto snapshot = emscripten::val::object();
     snapshot.set("success", result.success);
-    snapshot.set("instrumentProfileId", std::string("provisional-a-mixolydian-v1"));
+    snapshot.set("instrumentProfileId", std::string("provisional-a-mixolydian-v2"));
 
     auto summary = emscripten::val::object();
     summary.set("format", result.summary.format);
@@ -109,10 +109,10 @@ songstick::Song demo_song() {
         "wasm-demo",
         "Portable core demo",
         {
-            {0, 800'000, {0, 2}, 60},
-            {1'000'000, 800'000, {1, 4}, 62},
-            {2'000'000, 800'000, {2, 5}, 64},
-            {3'000'000, 800'000, {1, 4}, 62},
+            {0, 800'000, {0, 0}, 45},
+            {1'000'000, 800'000, {0, 2}, 49},
+            {2'000'000, 800'000, {1, 4}, 59},
+            {3'000'000, 800'000, {2, 5}, 64},
         },
     };
 }

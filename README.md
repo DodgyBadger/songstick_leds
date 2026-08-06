@@ -42,7 +42,8 @@ The server binds to `0.0.0.0:43173` and fails if that port is already occupied.
 The stable shared URL is `https://songstick.dodgybadger.icu`, forwarded by Caddy
 to port `43173`.
 It displays a fixed, already-fingered test song on a configurable physical RGB
-strip simulation. The provisional default is 12 frets with one LED per fret;
+strip simulation. The provisional default is one shared RGB open indicator plus
+12 frets with one LED per fret;
 density, controller description, and explicit index mapping can be changed in
 the browser. Playback and logical LED snapshots remain authoritative C++/WASM
 output. The current screen is still an evolving simulator, not an approved

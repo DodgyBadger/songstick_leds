@@ -74,14 +74,20 @@ bool has_code(const songstick::ImportResult& result, std::string_view code) {
 
 void test_provisional_profile() {
     const auto profile = songstick::provisional_a_mixolydian_profile();
-    CHECK(profile.positions.size() == 36);
-    CHECK(profile.positions[2].midi_pitch == 50);
-    CHECK(profile.positions[2].position.string_index == 0);
-    CHECK(profile.positions[2].position.fret == 3);
-    CHECK(profile.positions[14].midi_pitch == 57);
-    CHECK(profile.positions[14].position.string_index == 1);
-    CHECK(profile.positions[14].position.fret == 3);
-    CHECK(profile.positions[26].midi_pitch == 62);
+    CHECK(profile.positions.size() == 39);
+    CHECK(profile.positions[0].midi_pitch == 45);
+    CHECK(profile.positions[0].position.string_index == 0);
+    CHECK(profile.positions[0].position.fret == 0);
+    CHECK(profile.positions[3].midi_pitch == 50);
+    CHECK(profile.positions[3].position.string_index == 0);
+    CHECK(profile.positions[3].position.fret == 3);
+    CHECK(profile.positions[13].midi_pitch == 52);
+    CHECK(profile.positions[13].position.string_index == 1);
+    CHECK(profile.positions[13].position.fret == 0);
+    CHECK(profile.positions[16].midi_pitch == 57);
+    CHECK(profile.positions[16].position.string_index == 1);
+    CHECK(profile.positions[16].position.fret == 3);
+    CHECK(profile.positions[29].midi_pitch == 62);
 }
 
 void test_valid_running_status_and_tempo_map() {
@@ -105,6 +111,19 @@ void test_valid_running_status_and_tempo_map() {
     CHECK(result.song.events[1].start_microseconds == 500'000);
     CHECK(result.song.events[1].duration_microseconds == 1'000'000);
     CHECK(result.song.events[1].position.fret == 4);
+}
+
+void test_open_string_fingering() {
+    const auto open_note = import(midi_file({
+        0x00, 0x90, 0x2D, 0x64,
+        0x83, 0x60, 0x2D, 0x00,
+        0x00, 0xFF, 0x2F, 0x00,
+    }));
+    CHECK(open_note.success);
+    CHECK(open_note.song.events.size() == 1);
+    CHECK(open_note.song.events[0].midi_pitch == 45);
+    CHECK(open_note.song.events[0].position.string_index == 0);
+    CHECK(open_note.song.events[0].position.fret == 0);
 }
 
 void test_rejections_are_structured() {
@@ -158,6 +177,7 @@ void test_polyphony_and_unplayable_pitch() {
 int main() {
     test_provisional_profile();
     test_valid_running_status_and_tempo_map();
+    test_open_string_fingering();
     test_rejections_are_structured();
     test_polyphony_and_unplayable_pitch();
 

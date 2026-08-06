@@ -85,6 +85,7 @@ const fretCountInput = required<HTMLInputElement>('#fret-count');
 const ledsPerFretInput = required<HTMLInputElement>('#leds-per-fret');
 const ledsPerMeterInput = required<HTMLInputElement>('#leds-per-meter');
 const controllerInput = required<HTMLInputElement>('#controller');
+const openMappingInput = required<HTMLInputElement>('#open-index-mapping');
 const mappingInput = required<HTMLTextAreaElement>('#index-mapping');
 const resetConfig = required<HTMLButtonElement>('#reset-config');
 const midiFileInput = required<HTMLInputElement>('#midi-file');
@@ -108,6 +109,7 @@ const populateConfigForm = (config: LedStripConfig): void => {
   ledsPerFretInput.value = String(config.ledsPerFret);
   ledsPerMeterInput.value = config.ledsPerMeter === null ? '' : String(config.ledsPerMeter);
   controllerInput.value = config.controller ?? '';
+  openMappingInput.value = config.openLedIndexes.join(',');
   mappingInput.value = formatMapping(config.fretToLedIndexes);
 };
 
@@ -180,12 +182,12 @@ const renderStrip = (frame: LogicalLedFrame): void => {
   const physicalFrame = mapLogicalFrame(stripConfig, frame);
   const elements = physicalFrame.map((led) => {
     const wrapper = document.createElement('div');
-    wrapper.className = `physical-led physical-led--${led.role}`;
+    wrapper.className = `physical-led physical-led--${led.role}${led.open ? ' physical-led--open' : ''}`;
     wrapper.setAttribute(
       'aria-label',
       led.active
-        ? `LED ${led.index}, fret ${led.frets.join(', ')}, ${led.role}, string ${(led.stringIndex ?? 0) + 1}`
-        : `LED ${led.index}, ${led.frets.length ? `fret ${led.frets.join(', ')}` : 'unmapped'}, off`,
+        ? `LED ${led.index}, ${led.open ? 'open position' : `fret ${led.frets.join(', ')}`}, ${led.role}, string ${(led.stringIndex ?? 0) + 1}`
+        : `LED ${led.index}, ${led.open ? 'open position' : led.frets.length ? `fret ${led.frets.join(', ')}` : 'unmapped'}, off`,
     );
 
     const index = document.createElement('span');
@@ -199,7 +201,7 @@ const renderStrip = (frame: LogicalLedFrame): void => {
 
     const fret = document.createElement('span');
     fret.className = 'physical-led__fret';
-    fret.textContent = led.frets.length ? `F${led.frets.join(',')}` : '—';
+    fret.textContent = led.open ? 'OPEN' : led.frets.length ? `F${led.frets.join(',')}` : '—';
 
     wrapper.append(index, light, fret);
     return wrapper;
@@ -214,7 +216,7 @@ const renderStrip = (frame: LogicalLedFrame): void => {
     ? 'density unspecified'
     : `${stripConfig.ledsPerMeter} LEDs/m`;
   const controller = stripConfig.controller ?? 'controller unspecified';
-  stripSummary.textContent = `${physicalLedCount(stripConfig)} physical LEDs · ${stripConfig.fretCount} frets · ${stripConfig.ledsPerFret} LED/fret · RGB · ${density} · ${controller}`;
+  stripSummary.textContent = `${physicalLedCount(stripConfig)} physical LEDs · shared open indicator · ${stripConfig.fretCount} frets · ${stripConfig.ledsPerFret} LED/fret · RGB · ${density} · ${controller}`;
 };
 
 const render = (): void => {
@@ -265,6 +267,7 @@ configForm.addEventListener('submit', (event) => {
     ledsPerFret: ledsPerFretInput.value,
     ledsPerMeter: ledsPerMeterInput.value,
     controller: controllerInput.value,
+    openMapping: openMappingInput.value,
     mapping: mappingInput.value,
   });
   if (!result.ok) {

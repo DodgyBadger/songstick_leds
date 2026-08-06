@@ -29,7 +29,7 @@
         </div>
         <p class="profile-notice">
           Conversion currently assumes the provisional A-Mixolydian profile:
-          A2–E3–A3 open strings, 12 diatonic frets, and no open-position LED.
+          A2–E3–A3 open strings, one shared open indicator, and 12 diatonic frets.
         </p>
         <p id="import-status" class="import-status">Choose a `.mid` or `.midi` file to replace the demonstration song.</p>
         <div id="import-summary" class="import-summary" hidden>
@@ -117,6 +117,10 @@
               <span>Color order</span>
               <input type="text" value="RGB" disabled />
             </label>
+            <label class="field">
+              <span>Open-position LED indexes</span>
+              <input id="open-index-mapping" type="text" inputmode="numeric" required />
+            </label>
           </div>
 
           <label class="field">
@@ -124,7 +128,8 @@
             <textarea id="index-mapping" rows="4" spellcheck="false" required></textarea>
             <small>
               Separate frets with semicolons and multiple indexes on a fret with commas.
-              Example: <code>0;1;2</code> or <code>0,1;2,3</code>.
+              The open position is configured separately. Example fret mappings:
+              <code>1;2;3</code> or <code>1,2;3,4</code>.
             </small>
           </label>
           <p id="config-error" class="config-error" role="alert"></p>

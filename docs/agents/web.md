@@ -12,7 +12,8 @@ same observable behavior expected from the physical strip.
 The harness uses TypeScript and Vite without a UI framework. Do not treat its
 markup, styling, demo song, or control layout as final product design. Its
 configurable physical-strip view and provisional 12-fret, one-LED-per-fret RGB
-default are confirmed simulator requirements. Do not add
+default are confirmed simulator requirements. The default also includes one
+shared RGB `OPEN` indicator before fret 1. Do not add
 a UI framework, song schema, or persistence mechanism without a requirement and
 an implementation plan. Any development server must follow the networking rules
 in `environment.md`.

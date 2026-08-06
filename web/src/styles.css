@@ -374,6 +374,18 @@ textarea {
     inset 0 0.12rem 0.2rem rgba(255, 255, 255, 0.35);
 }
 
+.physical-led--open {
+  margin-right: 0.8rem;
+  padding-right: 0.8rem;
+  border-right: 1px dashed #58636b;
+}
+
+.physical-led--open .physical-led__fret {
+  color: #c8d3db;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+}
+
 .physical-led--current .physical-led__index,
 .physical-led--current .physical-led__fret {
   color: #f5f7f8;

@@ -19,11 +19,13 @@ export interface LedStripConfig {
   ledsPerMeter: number | null;
   controller: string | null;
   colorOrder: 'RGB';
+  openLedIndexes: number[];
   fretToLedIndexes: number[][];
 }
 
 export interface PhysicalLedState {
   index: number;
+  open: boolean;
   frets: number[];
   active: boolean;
   role: LedRole;
@@ -37,6 +39,7 @@ export interface ConfigFields {
   ledsPerFret: string;
   ledsPerMeter: string;
   controller: string;
+  openMapping: string;
   mapping: string;
 }
 
@@ -55,7 +58,8 @@ export const defaultLedStripConfig = (): LedStripConfig => ({
   ledsPerMeter: null,
   controller: null,
   colorOrder: 'RGB',
-  fretToLedIndexes: Array.from({ length: 12 }, (_, index) => [index]),
+  openLedIndexes: [0],
+  fretToLedIndexes: Array.from({ length: 12 }, (_, index) => [index + 1]),
 });
 
 export const formatMapping = (mapping: readonly (readonly number[])[]): string =>
@@ -86,12 +90,24 @@ export const parseLedStripConfig = (fields: ConfigFields): ConfigResult => {
       ? null
       : parseInteger(densityText, 'LEDs per metre', 1, 1000);
 
+    const openValues = fields.openMapping.split(',').map((value) => value.trim());
+    if (openValues.length === 0 || openValues.length > MAX_LEDS_PER_FRET || openValues.some((value) => value === '')) {
+      throw new Error(`Open position needs between 1 and ${MAX_LEDS_PER_FRET} LED index values.`);
+    }
+
+    const usedIndexes = new Set<number>();
+    const openLedIndexes = openValues.map((value) => {
+      const index = parseInteger(value, 'Open LED index', 0, MAX_LED_INDEX);
+      if (usedIndexes.has(index)) throw new Error(`LED index ${index} is mapped more than once.`);
+      usedIndexes.add(index);
+      return index;
+    });
+
     const groups = fields.mapping.split(';').map((group) => group.trim());
     if (groups.length !== fretCount) {
       throw new Error(`Index mapping needs ${fretCount} semicolon-separated fret groups.`);
     }
 
-    const usedIndexes = new Set<number>();
     const fretToLedIndexes = groups.map((group, fretIndex) => {
       const values = group === '' ? [] : group.split(',').map((value) => value.trim());
       if (values.length !== ledsPerFret) {
@@ -115,6 +131,7 @@ export const parseLedStripConfig = (fields: ConfigFields): ConfigResult => {
         ledsPerMeter,
         controller: fields.controller.trim() || null,
         colorOrder: 'RGB',
+        openLedIndexes,
         fretToLedIndexes,
       },
     };
@@ -124,13 +141,14 @@ export const parseLedStripConfig = (fields: ConfigFields): ConfigResult => {
 };
 
 export const physicalLedCount = (config: LedStripConfig): number =>
-  Math.max(...config.fretToLedIndexes.flat()) + 1;
+  Math.max(...config.openLedIndexes, ...config.fretToLedIndexes.flat()) + 1;
 
 export const mapLogicalFrame = (
   config: LedStripConfig,
   frame: LogicalLedFrame,
 ): PhysicalLedState[] => {
   const count = physicalLedCount(config);
+  const openIndexes = new Set(config.openLedIndexes);
   const fretsByIndex = Array.from({ length: count }, () => [] as number[]);
   config.fretToLedIndexes.forEach((indexes, fretIndex) => {
     indexes.forEach((index) => fretsByIndex[index].push(fretIndex + 1));
@@ -138,6 +156,7 @@ export const mapLogicalFrame = (
 
   const leds = Array.from({ length: count }, (_, index): PhysicalLedState => ({
     index,
+    open: openIndexes.has(index),
     frets: fretsByIndex[index],
     active: false,
     role: 'off',
@@ -147,8 +166,11 @@ export const mapLogicalFrame = (
   }));
 
   const apply = (output: LogicalLedOutput): void => {
-    if (!output.active || output.fret < 1 || output.fret > config.fretCount) return;
-    for (const index of config.fretToLedIndexes[output.fret - 1]) {
+    if (!output.active || output.fret < 0 || output.fret > config.fretCount) return;
+    const indexes = output.fret === 0
+      ? config.openLedIndexes
+      : config.fretToLedIndexes[output.fret - 1];
+    for (const index of indexes) {
       leds[index] = {
         ...leds[index],
         active: true,

@@ -17,6 +17,8 @@ Keep its assumptions distinct from confirmed facts.
 - A shareable browser simulator will support development and feedback without
   repeatedly flashing hardware.
 - The provisional simulator profile uses RGB, 12 frets, and one LED per fret.
+- One shared RGB LED at the nut represents logical fret 0; color identifies the
+  open string.
 - LED-strip particulars such as density, controller, and physical index mapping
   must be configurable.
 

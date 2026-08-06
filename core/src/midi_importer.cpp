@@ -240,9 +240,13 @@ bool parse_channel_event(
 InstrumentProfile provisional_a_mixolydian_profile() {
     constexpr std::array<std::uint8_t, 3> open_pitches{45, 52, 57};
     constexpr std::array<std::uint8_t, 12> fret_offsets{2, 4, 5, 7, 9, 10, 12, 14, 16, 17, 19, 21};
-    InstrumentProfile profile{"provisional-a-mixolydian-v1", "Provisional A Mixolydian (A2 E3 A3)", {}};
-    profile.positions.reserve(open_pitches.size() * fret_offsets.size());
+    InstrumentProfile profile{"provisional-a-mixolydian-v2", "Provisional A Mixolydian (A2 E3 A3 with open)", {}};
+    profile.positions.reserve(open_pitches.size() * (fret_offsets.size() + 1));
     for (std::size_t string_index = 0; string_index < open_pitches.size(); ++string_index) {
+        profile.positions.push_back({
+            open_pitches[string_index],
+            {static_cast<std::uint8_t>(string_index), 0},
+        });
         for (std::size_t fret_index = 0; fret_index < fret_offsets.size(); ++fret_index) {
             profile.positions.push_back({
                 static_cast<std::uint8_t>(open_pitches[string_index] + fret_offsets[fret_index]),

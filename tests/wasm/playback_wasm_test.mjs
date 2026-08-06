@@ -74,6 +74,15 @@ try {
   assert(!empty.success, 'empty MIDI bytes should be rejected');
   assert(empty.diagnostics[0].code === 'MIDI_EMPTY', 'empty upload diagnostic should cross the boundary');
 
+  const openString = playback.importMidi(midiFile([
+    0x00, 0x90, 0x2d, 0x64,
+    0x83, 0x60, 0x2d, 0x00,
+    0x00, 0xff, 0x2f, 0x00,
+  ]));
+  assert(openString.success, 'provisional A2 open string should import');
+  assert(openString.instrumentProfileId === 'provisional-a-mixolydian-v2', 'open profile version should cross the boundary');
+  assert(playback.ledFrame().current.fret === 0, 'imported A2 should map to logical open');
+
   console.log('WebAssembly playback integration passed');
 } finally {
   playback.delete();
