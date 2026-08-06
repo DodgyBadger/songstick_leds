@@ -39,6 +39,8 @@ npm run dev
 ```
 
 The server binds to `0.0.0.0:43173` and fails if that port is already occupied.
+The stable shared URL is `https://songstick.dodgybadger.icu`, forwarded by Caddy
+to port `43173`.
 It displays a fixed, already-fingered test song to prove that browser controls
 and rendering consume authoritative playback and LED snapshots from C++/WASM.
 It is intentionally not the product UI described in the requirements.

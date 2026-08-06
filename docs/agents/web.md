@@ -16,4 +16,6 @@ an implementation plan. Any development server must follow the networking rules
 in `environment.md`.
 
 Run `npm run dev` for the strict `0.0.0.0:43173` development server and
-`npm run build` for the static production output.
+`npm run build` for the static production output. The stable shared development
+hostname is `songstick.dodgybadger.icu`; keep it in Vite's explicit allowed-host
+list rather than allowing arbitrary proxy hostnames.
