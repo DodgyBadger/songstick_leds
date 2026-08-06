@@ -1,7 +1,7 @@
 # Song Stick LED Teacher — Product Requirements Document
 
 **Status:** Initial draft
-**Version:** 0.1
+**Version:** 0.2
 **Date:** 2026-08-06
 **Project:** West End Maker Shed Song Stick
 **Development approach:** Simulation-first, shared portable C++ core
@@ -462,6 +462,13 @@ This mapping accommodates unequal fret spacing, different neck lengths, and cali
 The initial physical concept uses one RGB LED position per fret area, with string represented by colour. Do not assume one physical LED per string.
 
 The developer view should show both logical fret positions and physical LED indexes.
+
+The browser simulator must make strip particulars configurable, including at
+least fret count, LEDs per fret, optional LEDs per metre, controller description,
+and explicit index mapping. Until physical hardware is confirmed, use a clearly
+provisional RGB profile with 12 frets and one LED per fret. Unconfirmed density
+and controller values must remain unspecified rather than appearing as hardware
+decisions.
 
 ## 9. Browser simulator requirements
 

@@ -41,9 +41,12 @@ npm run dev
 The server binds to `0.0.0.0:43173` and fails if that port is already occupied.
 The stable shared URL is `https://songstick.dodgybadger.icu`, forwarded by Caddy
 to port `43173`.
-It displays a fixed, already-fingered test song to prove that browser controls
-and rendering consume authoritative playback and LED snapshots from C++/WASM.
-It is intentionally not the product UI described in the requirements.
+It displays a fixed, already-fingered test song on a configurable physical RGB
+strip simulation. The provisional default is 12 frets with one LED per fret;
+density, controller description, and explicit index mapping can be changed in
+the browser. Playback and logical LED snapshots remain authoritative C++/WASM
+output. The current screen is still an evolving simulator, not an approved
+touchscreen design.
 
 See [AGENTS.md](AGENTS.md) for coding-agent guidance and
 [docs/agents/environment.md](docs/agents/environment.md) for environment details.

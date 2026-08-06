@@ -33,3 +33,4 @@ replace a changed decision with a new ADR that supersedes the old one.
 | ADR | Status | Decision |
 |---|---|---|
 | [0001](0001-wasm-snapshot-boundary.md) | Accepted | Use Embind on a facade that exchanges coarse playback and LED snapshots. |
+| [0002](0002-explicit-led-strip-mapping.md) | Accepted | Map logical fret output to explicit physical LED indexes in platform configuration. |

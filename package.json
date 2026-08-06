@@ -12,7 +12,8 @@
     "dev": "npm run prepare:web && vite --config vite.config.ts",
     "typecheck": "tsc --noEmit",
     "build": "npm run prepare:web && npm run typecheck && vite build --config vite.config.ts",
-    "test": "./scripts/test-native && ./scripts/test-wasm"
+    "test:web": "node tests/web/led-strip.test.ts",
+    "test": "./scripts/test-native && ./scripts/test-wasm && npm run test:web"
   },
   "devDependencies": {
     "typescript": "7.0.2",

@@ -13,10 +13,13 @@ This file is a concise routing aid and must not override the specification.
 - Songs will be loaded onto an ESP32 and selected by the learner.
 - A shareable browser simulator will support development and feedback without
   repeatedly flashing hardware.
+- The provisional simulator profile uses RGB, 12 frets, and one LED per fret.
+- LED-strip particulars such as density, controller, and physical index mapping
+  must be configurable.
 
 ## Not yet specified
 
-- Physical fret count and LED-to-string/fret mapping
+- Final physical fret count and LED index mapping
 - Tuning, note representation, chords, rhythm, and lesson progression
 - ESP32 board, LED chipset, controls, display, storage, and electrical design
 - Song authoring and file format

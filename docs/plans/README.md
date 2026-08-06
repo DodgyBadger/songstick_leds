@@ -32,3 +32,4 @@ link a follow-up plan instead of rewriting its history.
 | Plan | Status | Summary |
 |---|---|---|
 | [0001](0001-portable-core-wasm-slice.md) | Completed | Prove deterministic native and WebAssembly playback with a minimal browser harness. |
+| [0002](0002-configurable-led-strip-simulator.md) | Completed | Replace text output with a configurable physical RGB strip simulation. |
