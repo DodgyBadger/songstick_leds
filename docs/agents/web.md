@@ -21,3 +21,7 @@ Run `npm run dev` for the strict `0.0.0.0:43173` development server and
 `npm run build` for the static production output. The stable shared development
 hostname is `songstick.dodgybadger.icu`; keep it in Vite's explicit allowed-host
 list rather than allowing arbitrary proxy hostnames.
+
+The current upload flow accepts monophonic Standard MIDI File format 0 and sends
+raw bytes to the C++/WASM importer. TypeScript may display returned summaries and
+diagnostics but must not parse MIDI, resolve tempo, or assign fingerings.

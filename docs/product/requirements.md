@@ -1,7 +1,7 @@
 # Song Stick LED Teacher — Product Requirements Document
 
 **Status:** Initial draft
-**Version:** 0.2
+**Version:** 0.3
 **Date:** 2026-08-06
 **Project:** West End Maker Shed Song Stick
 **Development approach:** Simulation-first, shared portable C++ core
@@ -176,6 +176,11 @@ The instrument definition must be configurable and contain at least:
 - Logical-fret-to-physical-LED mapping
 
 Use a clearly labelled provisional test profile until the team confirms the real tuning and fret geometry.
+
+The current implementation assumptions and their physical verification checklist
+are maintained in [`provisional-instrument-profile.md`](provisional-instrument-profile.md).
+They may be used to unblock simulation and MIDI work but are not confirmed
+construction requirements.
 
 ### 8.2 Standard MIDI File support
 

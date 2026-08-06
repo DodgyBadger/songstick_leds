@@ -4,6 +4,9 @@ Read [`../product/requirements.md`](../product/requirements.md) as the
 authoritative specification before product-facing work. Follow
 [`../product/README.md`](../product/README.md) when changing or versioning it.
 This file is a concise routing aid and must not override the specification.
+Read [`../product/provisional-instrument-profile.md`](../product/provisional-instrument-profile.md)
+when work depends on tuning, fret pitches, scale length, or open-position behavior.
+Keep its assumptions distinct from confirmed facts.
 
 ## Known
 

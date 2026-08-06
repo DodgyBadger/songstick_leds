@@ -34,3 +34,4 @@ replace a changed decision with a new ADR that supersedes the old one.
 |---|---|---|
 | [0001](0001-wasm-snapshot-boundary.md) | Accepted | Use Embind on a facade that exchanges coarse playback and LED snapshots. |
 | [0002](0002-explicit-led-strip-mapping.md) | Accepted | Map logical fret output to explicit physical LED indexes in platform configuration. |
+| [0003](0003-explicit-playable-position-profile.md) | Accepted | Convert pitch using explicit playable string/fret positions. |

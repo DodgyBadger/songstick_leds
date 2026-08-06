@@ -6,6 +6,7 @@ option(SONGSTICK_BUILD_TESTS "Build native tests" ON)
 option(SONGSTICK_BUILD_WASM "Build the WebAssembly facade" OFF)
 
 add_library(songstick_core
+    core/src/midi_importer.cpp
     core/src/playback.cpp
 )
 target_include_directories(songstick_core PUBLIC core/include)
@@ -34,6 +35,17 @@ if(SONGSTICK_BUILD_TESTS)
         -Wsign-conversion
     )
     add_test(NAME songstick_core_tests COMMAND songstick_core_tests)
+
+    add_executable(songstick_midi_tests tests/unit/midi_importer_test.cpp)
+    target_link_libraries(songstick_midi_tests PRIVATE songstick_core)
+    target_compile_options(songstick_midi_tests PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Wconversion
+        -Wsign-conversion
+    )
+    add_test(NAME songstick_midi_tests COMMAND songstick_midi_tests)
 endif()
 
 if(SONGSTICK_BUILD_WASM)

@@ -48,6 +48,12 @@ the browser. Playback and logical LED snapshots remain authoritative C++/WASM
 output. The current screen is still an evolving simulator, not an approved
 touchscreen design.
 
+The simulator can also upload monophonic Standard MIDI File format 0. Parsing,
+tempo resolution, validation, and provisional A-Mixolydian fingering all run in
+the portable C++ core. Format 1, polyphony reduction, and final instrument
+calibration remain future work. Current tuning assumptions are documented in
+[`docs/product/provisional-instrument-profile.md`](docs/product/provisional-instrument-profile.md).
+
 See [AGENTS.md](AGENTS.md) for coding-agent guidance and
 [docs/agents/environment.md](docs/agents/environment.md) for environment details.
 Project documentation is indexed in [docs/README.md](docs/README.md).

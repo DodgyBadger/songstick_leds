@@ -5,6 +5,21 @@ const wasmBinary = await readFile(new URL('../../build/wasm/songstick.wasm', imp
 const module = await createSongstickModule({ wasmBinary });
 const playback = new module.Playback();
 
+function midiFile(track) {
+  const bytes = [
+    0x4d, 0x54, 0x68, 0x64,
+    0x00, 0x00, 0x00, 0x06,
+    0x00, 0x00, 0x00, 0x01, 0x01, 0xe0,
+    0x4d, 0x54, 0x72, 0x6b,
+    (track.length >>> 24) & 0xff,
+    (track.length >>> 16) & 0xff,
+    (track.length >>> 8) & 0xff,
+    track.length & 0xff,
+    ...track,
+  ];
+  return new Uint8Array(bytes);
+}
+
 function assert(condition, message) {
   if (!condition) {
     throw new Error(message);
@@ -38,6 +53,26 @@ try {
   playback.update(10_000_000);
   playback.update(10_250_000);
   assert(playback.state().positionMicroseconds === 1_000_000, 'resume should preserve position');
+
+  const imported = playback.importMidi(midiFile([
+    0x00, 0xff, 0x03, 0x04, 0x57, 0x41, 0x53, 0x4d,
+    0x00, 0x90, 0x32, 0x64,
+    0x83, 0x60, 0x32, 0x00,
+    0x00, 0xff, 0x2f, 0x00,
+  ]));
+  assert(imported.success, 'valid MIDI bytes should import');
+  assert(imported.summary.trackName === 'WASM', 'track metadata should cross the boundary');
+  assert(imported.summary.noteCount === 1, 'note count should cross the boundary');
+  assert(playback.state().status === 'stopped', 'successful import should load the converted song');
+  assert(playback.ledFrame().current.fret === 3, 'imported D3 should map to provisional fret 3');
+
+  const malformed = playback.importMidi(new Uint8Array([0x00, 0x01]));
+  assert(!malformed.success, 'invalid MIDI bytes should be rejected');
+  assert(malformed.diagnostics[0].code === 'MIDI_HEADER_SIGNATURE', 'diagnostics should cross the boundary');
+
+  const empty = playback.importMidi(new Uint8Array());
+  assert(!empty.success, 'empty MIDI bytes should be rejected');
+  assert(empty.diagnostics[0].code === 'MIDI_EMPTY', 'empty upload diagnostic should cross the boundary');
 
   console.log('WebAssembly playback integration passed');
 } finally {

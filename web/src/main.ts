@@ -26,10 +26,39 @@ interface WasmPlayback {
   pause(): void;
   restart(): void;
   setSpeedPermille(speed: number): boolean;
+  importMidi(bytes: Uint8Array): MidiImportResult;
   update(monotonicMicroseconds: number): void;
   state(): PlaybackSnapshot;
   ledFrame(): LogicalLedFrame;
   delete(): void;
+}
+
+interface MidiImportSummary {
+  format: number;
+  ticksPerQuarter: number;
+  trackName: string;
+  midiEventCount: number;
+  noteCount: number;
+  tempoChangeCount: number;
+  minimumPitch: number;
+  maximumPitch: number;
+  durationMicroseconds: number;
+  timeSignatureNumerator: number;
+  timeSignatureDenominator: number;
+}
+
+interface MidiDiagnostic {
+  severity: 'warning' | 'error';
+  code: string;
+  message: string;
+  tick: number;
+}
+
+interface MidiImportResult {
+  success: boolean;
+  instrumentProfileId: string;
+  summary: MidiImportSummary;
+  diagnostics: MidiDiagnostic[];
 }
 
 interface SongstickModule {
@@ -58,6 +87,12 @@ const ledsPerMeterInput = required<HTMLInputElement>('#leds-per-meter');
 const controllerInput = required<HTMLInputElement>('#controller');
 const mappingInput = required<HTMLTextAreaElement>('#index-mapping');
 const resetConfig = required<HTMLButtonElement>('#reset-config');
+const midiFileInput = required<HTMLInputElement>('#midi-file');
+const importStatus = required<HTMLElement>('#import-status');
+const importSummary = required<HTMLElement>('#import-summary');
+const importSummaryGrid = required<HTMLElement>('#import-summary-grid');
+const importDiagnostics = required<HTMLElement>('#import-diagnostics');
+const songLabel = required<HTMLElement>('#song-label');
 
 const module = (await createSongstickModule()) as SongstickModule;
 const playback = new module.Playback();
@@ -80,6 +115,66 @@ populateConfigForm(stripConfig);
 playPause.disabled = false;
 restart.disabled = false;
 speed.disabled = false;
+
+const midiNoteName = (pitch: number): string => {
+  const names = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
+  return `${names[pitch % 12]}${Math.floor(pitch / 12) - 1}`;
+};
+
+const summaryItem = (label: string, value: string): HTMLElement => {
+  const item = document.createElement('span');
+  const small = document.createElement('small');
+  small.textContent = label;
+  const strong = document.createElement('strong');
+  strong.textContent = value;
+  item.append(small, strong);
+  return item;
+};
+
+const renderImportResult = (filename: string, result: MidiImportResult): void => {
+  const summary = result.summary;
+  importSummary.hidden = false;
+  importStatus.textContent = result.success
+    ? `${filename} converted and loaded.`
+    : `${filename} could not be loaded.`;
+  importStatus.className = result.success ? 'import-status import-status--success' : 'import-status import-status--error';
+
+  const pitchRange = summary.noteCount === 0
+    ? '—'
+    : `${midiNoteName(summary.minimumPitch)}–${midiNoteName(summary.maximumPitch)}`;
+  const timeSignature = summary.timeSignatureNumerator === 0
+    ? 'Not specified'
+    : `${summary.timeSignatureNumerator}/${summary.timeSignatureDenominator}`;
+  importSummaryGrid.replaceChildren(
+    summaryItem('Track', summary.trackName || 'Unnamed'),
+    summaryItem('Format', String(summary.format)),
+    summaryItem('Duration', `${(summary.durationMicroseconds / 1_000_000).toFixed(2)} s`),
+    summaryItem('Notes', String(summary.noteCount)),
+    summaryItem('Pitch range', pitchRange),
+    summaryItem('PPQN', String(summary.ticksPerQuarter || '—')),
+    summaryItem('Tempo events', String(summary.tempoChangeCount)),
+    summaryItem('Time signature', timeSignature),
+  );
+
+  const diagnosticElements = result.diagnostics.map((diagnostic) => {
+    const item = document.createElement('li');
+    item.className = `diagnostic diagnostic--${diagnostic.severity}`;
+    const code = document.createElement('code');
+    code.textContent = diagnostic.code;
+    const message = document.createElement('span');
+    message.textContent = `${diagnostic.message}${diagnostic.tick > 0 ? ` (tick ${diagnostic.tick})` : ''}`;
+    item.append(code, message);
+    return item;
+  });
+  importDiagnostics.replaceChildren(...diagnosticElements);
+  importDiagnostics.hidden = diagnosticElements.length === 0;
+
+  if (result.success) {
+    songLabel.textContent = summary.trackName || filename;
+    speed.value = '750';
+    render();
+  }
+};
 
 const renderStrip = (frame: LogicalLedFrame): void => {
   const physicalFrame = mapLogicalFrame(stripConfig, frame);
@@ -147,6 +242,20 @@ restart.addEventListener('click', () => {
 speed.addEventListener('change', () => {
   playback.setSpeedPermille(Number(speed.value));
   render();
+});
+
+midiFileInput.addEventListener('change', async () => {
+  const file = midiFileInput.files?.[0];
+  if (!file) return;
+  importStatus.className = 'import-status';
+  importStatus.textContent = `Reading ${file.name}…`;
+  try {
+    const result = playback.importMidi(new Uint8Array(await file.arrayBuffer()));
+    renderImportResult(file.name, result);
+  } catch (error) {
+    importStatus.className = 'import-status import-status--error';
+    importStatus.textContent = error instanceof Error ? error.message : 'The MIDI import failed unexpectedly.';
+  }
 });
 
 configForm.addEventListener('submit', (event) => {

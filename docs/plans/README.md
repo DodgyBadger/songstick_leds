@@ -33,3 +33,4 @@ link a follow-up plan instead of rewriting its history.
 |---|---|---|
 | [0001](0001-portable-core-wasm-slice.md) | Completed | Prove deterministic native and WebAssembly playback with a minimal browser harness. |
 | [0002](0002-configurable-led-strip-simulator.md) | Completed | Replace text output with a configurable physical RGB strip simulation. |
+| [0003](0003-format-zero-midi-import.md) | Completed | Import monophonic format-0 MIDI through C++/WASM and play it in the simulator. |

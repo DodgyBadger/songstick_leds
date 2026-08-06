@@ -4,6 +4,10 @@
 specification. Keep its path stable so plans, ADRs, issues, and external links
 can refer to it without following versioned filenames.
 
+[`provisional-instrument-profile.md`](provisional-instrument-profile.md) records
+assumptions made to unblock implementation and the checklist needed to verify
+them against the physical instrument.
+
 ## Versioning
 
 The version records the maturity of the specification, not a software release:

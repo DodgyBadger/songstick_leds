@@ -20,6 +20,9 @@ struct NoteEvent {
     std::uint64_t duration_microseconds{0};
     Position position{};
     std::uint8_t midi_pitch{0};
+    std::uint8_t velocity{0};
+    std::uint8_t source_track{0};
+    std::uint8_t source_channel{0};
 };
 
 struct Song {

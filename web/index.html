@@ -16,10 +16,32 @@
         </p>
       </header>
 
+      <section class="panel import-panel" aria-labelledby="import-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Format 0 · monophonic</p>
+            <h2 id="import-heading">Load a MIDI song</h2>
+          </div>
+          <label class="file-picker">
+            <span>Choose MIDI file</span>
+            <input id="midi-file" type="file" accept=".mid,.midi,audio/midi,audio/x-midi" />
+          </label>
+        </div>
+        <p class="profile-notice">
+          Conversion currently assumes the provisional A-Mixolydian profile:
+          A2–E3–A3 open strings, 12 diatonic frets, and no open-position LED.
+        </p>
+        <p id="import-status" class="import-status">Choose a `.mid` or `.midi` file to replace the demonstration song.</p>
+        <div id="import-summary" class="import-summary" hidden>
+          <div id="import-summary-grid" class="import-summary__grid"></div>
+          <ul id="import-diagnostics" class="diagnostics" hidden></ul>
+        </div>
+      </section>
+
       <section class="panel playback-panel" aria-labelledby="playback-heading">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Fixed demonstration song</p>
+            <p id="song-label" class="eyebrow">Fixed demonstration song</p>
             <h2 id="playback-heading">Playback</h2>
           </div>
           <div class="status" aria-live="polite">
