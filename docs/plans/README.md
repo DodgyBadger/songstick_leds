@@ -1,0 +1,34 @@
+# Implementation plans
+
+Use a plan for work that spans multiple components, introduces a new subsystem,
+or benefits from explicit sequencing and verification. Small, local changes do
+not require one.
+
+## Naming
+
+Name plans with a four-digit sequence and short kebab-case title:
+
+```text
+0001-portable-core-wasm-spike.md
+0002-format-zero-midi-import.md
+```
+
+Copy [`template.md`](template.md), choose the next unused number, and add the
+plan to the index below. Numbers are never reused.
+
+## Statuses
+
+- **Draft:** Under discussion; implementation has not started.
+- **Active:** Approved and currently being implemented.
+- **Completed:** Delivered and verified; record the outcome.
+- **Abandoned:** Intentionally stopped; record why and what remains.
+
+Keep an active plan current when scope, sequencing, or discoveries change. Once
+completed or abandoned, treat it as a historical record; append corrections or
+link a follow-up plan instead of rewriting its history.
+
+## Index
+
+| Plan | Status | Summary |
+|---|---|---|
+| — | — | No implementation plans recorded yet. |

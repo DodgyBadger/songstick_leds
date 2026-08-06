@@ -1,0 +1,15 @@
+[project]
+name = "songstick-leds-tools"
+version = "0.0.0"
+description = "Development tooling for Songstick LEDs"
+requires-python = "==3.11.*"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "platformio==6.1.18",
+]
+
+[tool.uv]
+package = false
+required-version = ">=0.12,<0.13"

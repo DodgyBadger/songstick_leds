@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly REQUIRED_NODE_MAJOR="22"
+
+fail() {
+  echo "bootstrap: $*" >&2
+  exit 1
+}
+
+command -v uv >/dev/null 2>&1 || fail "uv 0.12.x is required: https://docs.astral.sh/uv/getting-started/installation/"
+command -v node >/dev/null 2>&1 || fail "Node.js 22.x is required (see .nvmrc)."
+command -v npm >/dev/null 2>&1 || fail "npm is required."
+
+node_major="$(node -p 'process.versions.node.split(".")[0]')"
+[[ "${node_major}" == "${REQUIRED_NODE_MAJOR}" ]] || fail "Node.js 22.x is required; found $(node --version). Run 'nvm use' if nvm is installed."
+
+echo "Syncing locked Python development tools"
+(cd "${REPO_ROOT}" && uv sync --locked)
+
+if [[ -f "${REPO_ROOT}/package-lock.json" ]]; then
+  echo "Installing pinned JavaScript dependencies"
+  (cd "${REPO_ROOT}" && npm ci)
+elif [[ -f "${REPO_ROOT}/package.json" ]]; then
+  echo "package.json exists without package-lock.json; skipping npm install."
+  echo "Run 'npm install' intentionally when the initial web dependencies are chosen."
+fi
+
+echo
+echo "Development environment is ready."
+echo "Run Python tools with: uv run <command>"
+echo "PlatformIO: $(cd "${REPO_ROOT}" && uv run pio --version)"
+echo "Node: $(node --version)"

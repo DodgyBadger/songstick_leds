@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+[[ -f "${REPO_ROOT}/uv.lock" && -x "${REPO_ROOT}/.venv/bin/python" ]] || {
+  echo "Environment is not bootstrapped. Run ./scripts/bootstrap." >&2
+  exit 1
+}
+
+(cd "${REPO_ROOT}" && uv lock --check)
+(cd "${REPO_ROOT}" && uv run python --version)
+(cd "${REPO_ROOT}" && uv run pio --version)
+node --version
+npm --version
