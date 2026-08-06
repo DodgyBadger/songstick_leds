@@ -17,6 +17,7 @@ node_modules/
 dist/
 coverage/
 *.log
+/web/public/wasm/
 
 # PlatformIO and embedded builds
 .pio/

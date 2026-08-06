@@ -1,11 +1,19 @@
 # Browser simulator
 
-The simulator is planned but has not been specified or implemented.
+The first integration harness lives under `web/`. It loads the C++ playback core
+through the generated Embind module and renders coarse state and LED snapshots
+for a fixed test song. It is architecture validation, not an approved product
+interface or visual design.
 
 When requirements arrive, keep the domain/playback model independent from DOM
 rendering and transport. Treat the browser LED display as an adapter for the
 same observable behavior expected from the physical strip.
 
-Do not choose a UI framework, song schema, persistence mechanism, control set,
-or visual language without requirements. Any development server must follow the
-networking rules in `environment.md`.
+The harness uses TypeScript and Vite without a UI framework. Do not treat its
+markup, styling, demo song, or control layout as a product decision. Do not add
+a UI framework, song schema, or persistence mechanism without a requirement and
+an implementation plan. Any development server must follow the networking rules
+in `environment.md`.
+
+Run `npm run dev` for the strict `0.0.0.0:43173` development server and
+`npm run build` for the static production output.

@@ -1,0 +1,21 @@
+{
+  "name": "songstick-leds",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "build:wasm": "./scripts/build-wasm",
+    "prepare:web": "./scripts/prepare-web",
+    "dev": "npm run prepare:web && vite --config vite.config.ts",
+    "typecheck": "tsc --noEmit",
+    "build": "npm run prepare:web && npm run typecheck && vite build --config vite.config.ts",
+    "test": "./scripts/test-native && ./scripts/test-wasm"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2",
+    "vite": "8.2.1"
+  }
+}

@@ -21,7 +21,7 @@ echo "Syncing locked Python development tools"
 
 if [[ -f "${REPO_ROOT}/package-lock.json" ]]; then
   echo "Installing pinned JavaScript dependencies"
-  (cd "${REPO_ROOT}" && npm ci)
+  (cd "${REPO_ROOT}" && npm ci --include=dev)
 elif [[ -f "${REPO_ROOT}/package.json" ]]; then
   echo "package.json exists without package-lock.json; skipping npm install."
   echo "Run 'npm install' intentionally when the initial web dependencies are chosen."

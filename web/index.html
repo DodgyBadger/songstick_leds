@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Songstick core integration harness</title>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">Development integration harness</p>
+        <h1>Songstick portable core</h1>
+        <p>
+          This temporary view drives a fixed song in the C++ WebAssembly core.
+          It is not the product interface.
+        </p>
+      </header>
+
+      <section class="controls" aria-label="Playback controls">
+        <button id="play-pause" type="button" disabled>Play</button>
+        <button id="restart" type="button" disabled>Restart</button>
+        <label>
+          Speed
+          <select id="speed" disabled>
+            <option value="500">50%</option>
+            <option value="750" selected>75%</option>
+            <option value="1000">100%</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="status" aria-live="polite">
+        <span>Status</span>
+        <strong id="status">Loading WebAssembly…</strong>
+        <span>Position</span>
+        <strong id="position">0.000 s</strong>
+      </section>
+
+      <section>
+        <h2>Logical LED frame</h2>
+        <div id="led-frame" class="led-frame"></div>
+      </section>
+
+      <section class="snapshot">
+        <h2>Core snapshot</h2>
+        <pre id="snapshot">Waiting for module…</pre>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

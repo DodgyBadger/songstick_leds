@@ -32,4 +32,4 @@ replace a changed decision with a new ADR that supersedes the old one.
 
 | ADR | Status | Decision |
 |---|---|---|
-| — | — | No architecture decisions recorded yet. |
+| [0001](0001-wasm-snapshot-boundary.md) | Accepted | Use Embind on a facade that exchanges coarse playback and LED snapshots. |

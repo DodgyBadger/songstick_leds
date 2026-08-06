@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+"${REPO_ROOT}/scripts/build-wasm"
+node "${REPO_ROOT}/tests/wasm/playback_wasm_test.mjs"

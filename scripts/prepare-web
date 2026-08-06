@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly WASM_PUBLIC_DIR="${REPO_ROOT}/web/public/wasm"
+
+"${REPO_ROOT}/scripts/build-wasm"
+mkdir -p "${WASM_PUBLIC_DIR}"
+cp "${REPO_ROOT}/build/wasm/songstick.js" "${WASM_PUBLIC_DIR}/songstick.js"
+cp "${REPO_ROOT}/build/wasm/songstick.wasm" "${WASM_PUBLIC_DIR}/songstick.wasm"

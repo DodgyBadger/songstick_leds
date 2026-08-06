@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly BUILD_DIR="${REPO_ROOT}/build/wasm"
+
+cd "${REPO_ROOT}"
+emcmake cmake \
+  --fresh \
+  -S . \
+  -B "${BUILD_DIR}" \
+  -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DSONGSTICK_BUILD_TESTS=OFF \
+  -DSONGSTICK_BUILD_WASM=ON
+cmake --build "${BUILD_DIR}"

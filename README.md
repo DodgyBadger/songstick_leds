@@ -1,10 +1,9 @@
 # Songstick LEDs
 
-Control software and a planned browser simulator for an ESP32-powered,
-LED-guided three-string song stick.
-
-Product development has not started yet. This repository currently establishes
-only the reproducible development-tool baseline.
+Control software and a browser simulator for an ESP32-powered, LED-guided
+three-string song stick. The first implementation slice provides a portable C++
+playback core compiled natively and to WebAssembly, plus a minimal browser
+integration harness.
 
 ## Bootstrap
 
@@ -17,9 +16,32 @@ Python 3.11. If you use `nvm`, run `nvm use` after cloning.
 ```
 
 The bootstrap is safe to run again. It runs `uv sync --locked` to reproduce the
-repository-local Python environment and PlatformIO CLI. It will use `npm ci`
-once a JavaScript lockfile is introduced. Run tools such as PlatformIO with
-`uv run pio`.
+repository-local Python environment and PlatformIO CLI. It uses the committed
+JavaScript lockfile with `npm ci --include=dev`. Run tools such as PlatformIO
+with `uv run pio`.
+
+## Build and test
+
+```bash
+./scripts/test-native
+./scripts/test-wasm
+npm test
+npm run build
+```
+
+The core is C++17 and uses CMake/Ninja. The WebAssembly facade is built with the
+container-provided Emscripten SDK and tested from Node before the web build.
+
+## Browser integration harness
+
+```bash
+npm run dev
+```
+
+The server binds to `0.0.0.0:43173` and fails if that port is already occupied.
+It displays a fixed, already-fingered test song to prove that browser controls
+and rendering consume authoritative playback and LED snapshots from C++/WASM.
+It is intentionally not the product UI described in the requirements.
 
 See [AGENTS.md](AGENTS.md) for coding-agent guidance and
 [docs/agents/environment.md](docs/agents/environment.md) for environment details.

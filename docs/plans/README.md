@@ -31,4 +31,4 @@ link a follow-up plan instead of rewriting its history.
 
 | Plan | Status | Summary |
 |---|---|---|
-| — | — | No implementation plans recorded yet. |
+| [0001](0001-portable-core-wasm-slice.md) | Completed | Prove deterministic native and WebAssembly playback with a minimal browser harness. |

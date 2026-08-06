@@ -1,0 +1,89 @@
+:root {
+  color: #e8edf2;
+  background: #101419;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  width: min(52rem, calc(100% - 2rem));
+  margin: 3rem auto;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+.eyebrow {
+  color: #8da2b5;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.controls,
+.status,
+.led-frame {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+button,
+select {
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  color: inherit;
+  background: #24303b;
+  border: 1px solid #536474;
+  border-radius: 0.35rem;
+  font: inherit;
+}
+
+label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  padding: 1rem;
+  background: #171e25;
+}
+
+.led {
+  flex: 1 1 15rem;
+  padding: 1rem;
+  border: 2px solid #e4e9ed;
+  border-radius: 0.5rem;
+}
+
+.led--next {
+  opacity: 0.55;
+}
+
+.led--off {
+  color: #788895;
+  border-color: #3a4650;
+}
+
+.snapshot pre {
+  overflow: auto;
+  padding: 1rem;
+  background: #07090b;
+  border-radius: 0.35rem;
+}
