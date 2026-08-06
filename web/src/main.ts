@@ -1,4 +1,5 @@
 import './styles.css';
+import createSongstickModule from './generated/songstick.js';
 
 type PlaybackStatus = 'stopped' | 'playing' | 'paused' | 'finished';
 
@@ -39,8 +40,6 @@ interface SongstickModule {
   Playback: new () => WasmPlayback;
 }
 
-type ModuleFactory = () => Promise<SongstickModule>;
-
 const required = <T extends Element>(selector: string): T => {
   const element = document.querySelector<T>(selector);
   if (!element) throw new Error(`Missing required element: ${selector}`);
@@ -55,9 +54,7 @@ const positionText = required<HTMLElement>('#position');
 const ledFrameElement = required<HTMLElement>('#led-frame');
 const snapshotElement = required<HTMLElement>('#snapshot');
 
-const moduleUrl = '/wasm/songstick.js';
-const moduleFactory = (await import(/* @vite-ignore */ moduleUrl)).default as ModuleFactory;
-const module = await moduleFactory();
+const module = (await createSongstickModule()) as SongstickModule;
 const playback = new module.Playback();
 
 if (!playback.loadDemoSong()) {
