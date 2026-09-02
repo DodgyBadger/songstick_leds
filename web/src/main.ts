@@ -1,5 +1,6 @@
 import './styles.css';
 import createSongstickModule from './generated/songstick.js';
+import { createElement as createIconElement, Play } from 'lucide';
 import {
   defaultLedStripConfig,
   formatMapping,
@@ -232,11 +233,16 @@ const renderSongLibrary = (songs: StoredMidiFile[]): void => {
     details.append(title, metadata);
 
     const playButton = document.createElement('button');
-    playButton.className = 'button button--primary song-item__play';
+    playButton.className = 'song-item__play';
     playButton.type = 'button';
-    playButton.textContent = '▶';
     playButton.setAttribute('aria-label', `Play ${song.originalName}`);
     playButton.title = `Play ${song.originalName}`;
+    playButton.append(createIconElement(Play, {
+      width: '13',
+      height: '13',
+      'stroke-width': '2.25',
+      'aria-hidden': 'true',
+    }));
     playButton.addEventListener('click', () => void playSavedSong(song));
     item.append(playButton, details);
     if (!song.builtIn) {

@@ -196,7 +196,7 @@ textarea {
 
 .song-item {
   display: grid;
-  grid-template-columns: 2rem minmax(0, 1fr) auto;
+  grid-template-columns: 1.4rem minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.7rem;
   padding: 0.55rem 0.65rem;
@@ -238,12 +238,27 @@ textarea {
   white-space: nowrap;
 }
 
-.button.song-item__play {
-  width: 2rem;
-  min-height: 2rem;
-  padding: 0 0 0.05rem 0.12rem;
-  border-radius: 50%;
-  line-height: 1;
+.song-item__play {
+  display: inline-grid;
+  width: 1.4rem;
+  height: 1.4rem;
+  padding: 0;
+  color: #79bfff;
+  background: transparent;
+  border: 0;
+  border-radius: 0.2rem;
+  cursor: pointer;
+  place-items: center;
+}
+
+.song-item__play:hover {
+  color: #b6dcff;
+  background: rgba(121, 191, 255, 0.08);
+}
+
+.song-item__play:focus-visible {
+  outline: 2px solid rgba(95, 174, 255, 0.7);
+  outline-offset: 1px;
 }
 
 .button--danger {
