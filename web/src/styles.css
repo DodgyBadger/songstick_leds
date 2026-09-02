@@ -206,14 +206,12 @@ textarea {
 }
 
 .song-item > div {
-  display: flex;
-  align-items: baseline;
-  gap: 0.7rem;
   min-width: 0;
   overflow: hidden;
 }
 
 .song-item strong {
+  display: block;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -230,12 +228,6 @@ textarea {
   font-size: 0.68rem;
   font-weight: 700;
   vertical-align: 0.1rem;
-}
-
-.song-item small {
-  flex: 0 0 auto;
-  color: #82909b;
-  white-space: nowrap;
 }
 
 .song-item__play {

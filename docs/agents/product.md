@@ -18,7 +18,7 @@ Keep its assumptions distinct from confirmed facts.
   MIDI files and provides Play and confirmed Delete actions.
 - MIDI import accepts `.mid` and `.midi` filename extensions and rejects others.
 - The prototype song selector always includes a non-deletable, playable built-in
-  test song.
+  test song lasting at least 10 musical seconds.
 - A shareable browser simulator will support development and feedback without
   repeatedly flashing hardware.
 - The provisional simulator profile uses RGB, 12 frets, and one LED per fret.

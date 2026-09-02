@@ -87,7 +87,8 @@ try {
   const builtInDemo = playback.importMidi(builtInMidiBytes);
   assert(builtInDemo.success, 'built-in catalog demo should remain compatible');
   assert(builtInDemo.summary.trackName === 'Songstick Demo', 'built-in demo title should cross the boundary');
-  assert(builtInDemo.summary.noteCount === 2, 'built-in demo should contain two playable notes');
+  assert(builtInDemo.summary.noteCount === 20, 'built-in demo should contain a useful playable phrase');
+  assert(builtInDemo.summary.durationMicroseconds === 10_000_000, 'built-in demo should last ten musical seconds');
 
   console.log('WebAssembly playback integration passed');
 } finally {

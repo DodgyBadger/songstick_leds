@@ -189,10 +189,6 @@ const renderImportResult = (filename: string, result: MidiImportResult): void =>
   }
 };
 
-const formatFileSize = (bytes: number): string => bytes < 1024
-  ? `${bytes} bytes`
-  : `${(bytes / 1024).toFixed(1)} KiB`;
-
 const playSavedSong = async (song: StoredMidiFile): Promise<void> => {
   importStatus.className = 'import-status';
   importStatus.textContent = `Loading ${song.originalName}…`;
@@ -226,11 +222,7 @@ const renderSongLibrary = (songs: StoredMidiFile[]): void => {
       badge.textContent = 'Built in';
       title.append(' ', badge);
     }
-    const metadata = document.createElement('small');
-    metadata.textContent = song.builtIn
-      ? `${formatFileSize(song.size)} · always available`
-      : `${formatFileSize(song.size)} · imported ${new Date(song.uploadedAt).toLocaleString()}`;
-    details.append(title, metadata);
+    details.append(title);
 
     const playButton = document.createElement('button');
     playButton.className = 'song-item__play';

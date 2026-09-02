@@ -35,6 +35,8 @@ storage identifier as the normal song label. Keep each selector entry on one row
 with a very small icon-only Play control on the left. Use the pinned Lucide
 dependency for interface icons rather than text glyphs.
 The prototype catalog also includes a known-good built-in MIDI demonstration
-song. Mark it as built-in and do not offer Delete for it.
+song lasting at least 10 musical seconds. Mark it as built-in and do not offer
+Delete for it. Keep selector rows strictly single-line; omit secondary metadata
+instead of wrapping it beneath the filename.
 TypeScript may display returned summaries and diagnostics but must not parse
 MIDI, resolve tempo, or assign fingerings.

@@ -1,7 +1,7 @@
 # Song Stick LED Teacher — Product Requirements Document
 
 **Status:** Initial draft
-**Version:** 0.6
+**Version:** 0.7
 **Date:** 2026-09-02
 **Project:** West End Maker Shed Song Stick
 **Development approach:** Simulation-first, shared portable C++ core
@@ -196,7 +196,8 @@ remain separate platform decisions.
 For the prototype, the selector must always include a playable built-in test
 song. It must be visibly distinguished from imported songs and cannot be
 deleted. This guarantees a known-good demonstration path without requiring an
-upload.
+upload. The prototype demo must contain enough note changes to exercise the LED
+display and last at least 10 musical seconds at 100% playback speed.
 
 ### 8.1 Instrument profile
 

@@ -80,3 +80,10 @@ mark the record as built-in so rendering can omit Delete.
   upload, retrieved all 67 bytes, and rejected deletion with HTTP 409.
 - **Follow-up work:** Choose final bundled controller content and packaging only
   after device storage constraints are known.
+
+## Follow-up update: 2026-09-02
+
+Usability feedback showed the initial two-note demo was too short to evaluate
+the LED sequence. It was expanded to 20 notes and exactly 10 musical seconds at
+100% speed. The selector's secondary size/date line was also removed so every
+song entry remains strictly single-line.
