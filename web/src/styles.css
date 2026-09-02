@@ -10,6 +10,10 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 body {
   min-width: 20rem;
   margin: 0;
@@ -81,6 +85,378 @@ h2 {
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.device-preview {
+  margin-top: 1rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  background: rgba(19, 25, 31, 0.9);
+  border: 1px solid #27323c;
+  border-radius: 0.75rem;
+  box-shadow: 0 1rem 4rem rgba(0, 0, 0, 0.18);
+}
+
+.viewport-picker {
+  display: grid;
+  gap: 0.25rem;
+  color: #8da2b5;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.viewport-picker select {
+  min-height: 2rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.78rem;
+}
+
+.device-screen {
+  position: relative;
+  width: min(100%, 320px);
+  aspect-ratio: 4 / 3;
+  margin: 1.25rem auto 0;
+  padding: 8px;
+  overflow: hidden;
+  color: #17202a;
+  background: #080b0d;
+  border: 5px solid #303940;
+  border-radius: 0.8rem;
+  box-shadow: 0 0.9rem 2.4rem rgba(0, 0, 0, 0.4), inset 0 0 0 1px #050607;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.device-screen[data-viewport="480x320"] {
+  width: min(100%, 480px);
+  aspect-ratio: 3 / 2;
+}
+
+.instrument-screen {
+  position: absolute;
+  inset: 8px;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  background: #eef2f2;
+  border-radius: 0.25rem;
+}
+
+.screen-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 43px;
+  padding: 6px 8px;
+  color: #f5fbff;
+  background: #176b87;
+}
+
+.screen-header h3,
+.screen-header p,
+.screen-dialog h3,
+.screen-dialog p {
+  margin: 0;
+}
+
+.screen-header h3 {
+  overflow: hidden;
+  font-size: 15px;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.screen-header small {
+  display: block;
+  color: #bfe4ef;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.screen-header--player {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.screen-header--player h3 {
+  text-align: right;
+}
+
+.screen-button,
+.screen-back,
+.screen-import,
+.screen-delete,
+.screen-icon-button,
+.tempo-control button {
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.screen-button,
+.screen-back,
+.screen-import {
+  min-height: 27px;
+  padding: 4px 7px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 0.3rem;
+}
+
+.screen-button--quiet,
+.screen-back,
+.screen-import {
+  color: #fff;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.screen-back {
+  border: 0;
+  background: transparent;
+}
+
+.screen-song-list {
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.screen-song-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  width: 100%;
+  min-height: 35px;
+  padding: 5px 8px;
+  color: #1a2933;
+  background: #fff;
+  border: 0;
+  border-bottom: 1px solid #d8e0e2;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.screen-song-row:hover,
+.screen-song-row:focus-visible {
+  background: #e3f4f8;
+  outline: 0;
+}
+
+.screen-song-row > span {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.screen-song-row small {
+  margin-left: 6px;
+  padding: 2px 4px;
+  color: #176b87;
+  background: #d9eef4;
+  border-radius: 99rem;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.screen-song-row--manage {
+  cursor: default;
+}
+
+.screen-delete {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  color: #a22d29;
+  background: transparent;
+  border: 0;
+  border-radius: 0.25rem;
+  place-items: center;
+}
+
+.screen-status {
+  min-height: 24px;
+  margin: 0;
+  padding: 5px 8px;
+  overflow: hidden;
+  color: #4d616b;
+  background: #e4eaec;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.screen-status--success {
+  color: #1c653b;
+}
+
+.screen-status--error {
+  color: #a22d29;
+}
+
+.instrument-screen--manage .screen-header {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.instrument-screen--manage .screen-header h3 {
+  text-align: center;
+}
+
+.screen-import {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+}
+
+.screen-import input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.player-main {
+  display: grid;
+  grid-template: auto auto auto 1fr / 1fr;
+  place-items: center;
+  min-height: 0;
+  padding: 8px 12px;
+}
+
+.player-status,
+.player-position {
+  margin: 0;
+  overflow: hidden;
+  color: #52656f;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-main progress {
+  width: 100%;
+  height: 7px;
+  margin-top: 4px;
+  accent-color: #176b87;
+}
+
+.player-controls {
+  display: grid;
+  grid-template-columns: 34px 48px 34px;
+  align-items: center;
+  gap: 7px;
+  margin: 4px 0;
+}
+
+.screen-icon-button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  color: #176b87;
+  background: #fff;
+  border: 1px solid #b7c9ce;
+  border-radius: 50%;
+  place-items: center;
+}
+
+.screen-icon-button--primary {
+  width: 48px;
+  height: 48px;
+  color: #fff;
+  background: #176b87;
+  border-color: #176b87;
+}
+
+.screen-icon-button:disabled,
+.tempo-control button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.tempo-control {
+  display: grid;
+  grid-template-columns: 30px 58px 30px;
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid #b7c9ce;
+  border-radius: 0.35rem;
+}
+
+.tempo-control button {
+  padding: 0;
+  color: #176b87;
+  background: #fff;
+  border: 0;
+  font-size: 18px;
+}
+
+.tempo-control span {
+  display: grid;
+  padding: 2px 4px;
+  color: #fff;
+  background: #176b87;
+  text-align: center;
+}
+
+.tempo-control small {
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tempo-control strong {
+  font-size: 11px;
+}
+
+.screen-dialog {
+  position: absolute;
+  z-index: 10;
+  inset: 8px;
+  display: grid;
+  padding: 18px;
+  background: rgba(7, 14, 18, 0.72);
+  place-items: center;
+}
+
+.screen-dialog__card {
+  width: min(100%, 220px);
+  padding: 13px;
+  color: #26343c;
+  background: #fff;
+  border-radius: 0.45rem;
+  box-shadow: 0 0.7rem 1.5rem rgba(0, 0, 0, 0.35);
+}
+
+.screen-dialog__card > p {
+  margin: 5px 0 12px;
+  overflow: hidden;
+  color: #61717a;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.screen-dialog__card > div {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.screen-dialog .screen-button--quiet {
+  color: #33444e;
+  border-color: #bdc9cd;
+  background: #edf1f2;
+}
+
+.screen-button--danger {
+  color: #fff;
+  background: #a83a35;
+  border-color: #a83a35;
 }
 
 .controls,
@@ -172,96 +548,6 @@ textarea {
 
 .import-summary {
   margin-top: 1rem;
-}
-
-.library-status {
-  margin: 0;
-  color: #8f9da8;
-  font-size: 0.85rem;
-}
-
-.song-list {
-  display: grid;
-  gap: 0.65rem;
-  margin-top: 1rem;
-}
-
-.song-library__empty {
-  margin: 0;
-  padding: 1rem;
-  color: #8f9da8;
-  background: #0e1419;
-  border-radius: 0.4rem;
-}
-
-.song-item {
-  display: grid;
-  grid-template-columns: 1.4rem minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.7rem;
-  padding: 0.55rem 0.65rem;
-  background: #0e1419;
-  border: 1px solid #26323b;
-  border-radius: 0.4rem;
-}
-
-.song-item > div {
-  min-width: 0;
-  overflow: hidden;
-}
-
-.song-item strong {
-  display: block;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.song-item__badge {
-  display: inline-block;
-  margin-left: 0.35rem;
-  padding: 0.08rem 0.4rem;
-  color: #9dd0ff;
-  background: #1b3042;
-  border-radius: 99rem;
-  font-size: 0.68rem;
-  font-weight: 700;
-  vertical-align: 0.1rem;
-}
-
-.song-item__play {
-  display: inline-grid;
-  width: 1.4rem;
-  height: 1.4rem;
-  padding: 0;
-  color: #79bfff;
-  background: transparent;
-  border: 0;
-  border-radius: 0.2rem;
-  cursor: pointer;
-  place-items: center;
-}
-
-.song-item__play:hover {
-  color: #b6dcff;
-  background: rgba(121, 191, 255, 0.08);
-}
-
-.song-item__play:focus-visible {
-  outline: 2px solid rgba(95, 174, 255, 0.7);
-  outline-offset: 1px;
-}
-
-.button--danger {
-  color: #ffaaa5;
-  border-color: #7b3936;
-}
-
-.button.song-item__delete {
-  min-height: 2rem;
-  padding: 0.25rem 0.65rem;
-  font-size: 0.8rem;
 }
 
 .import-summary__grid {

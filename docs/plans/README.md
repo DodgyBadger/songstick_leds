@@ -38,3 +38,4 @@ link a follow-up plan instead of rewriting its history.
 | [0005](0005-disk-backed-midi-upload.md) | Completed | Save browser-selected MIDI files to the development workspace before importing them. |
 | [0006](0006-song-selector.md) | Completed | Separate MIDI import from persistent song selection, playback, and deletion. |
 | [0007](0007-built-in-demo-song.md) | Completed | Keep a known-good, non-deletable demo in the prototype song selector. |
+| [0008](0008-tiny-screen-interface.md) | Completed | Replace stacked web controls with a bounded, stateful instrument touchscreen. |

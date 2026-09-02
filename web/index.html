@@ -16,64 +16,79 @@
         </p>
       </header>
 
-      <section class="panel import-panel" aria-labelledby="import-heading">
+      <section class="device-preview" aria-labelledby="device-preview-heading">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Format 0 · monophonic</p>
-            <h2 id="import-heading">Import a MIDI song</h2>
+            <p class="eyebrow">On-instrument prototype</p>
+            <h2 id="device-preview-heading">Touchscreen</h2>
           </div>
-          <label class="file-picker">
-            <span>Choose MIDI file</span>
-            <input id="midi-file" type="file" accept=".mid,.midi,audio/midi,audio/x-midi" />
-          </label>
-        </div>
-        <p class="profile-notice">
-          Conversion currently assumes the provisional A-Mixolydian profile:
-          A2–E3–A3 open strings, one shared open indicator, and 12 diatonic frets.
-        </p>
-        <p id="import-status" class="import-status">
-          Choose a `.mid` or `.midi` file to add it to the song library.
-        </p>
-        <div id="import-summary" class="import-summary" hidden>
-          <div id="import-summary-grid" class="import-summary__grid"></div>
-          <ul id="import-diagnostics" class="diagnostics" hidden></ul>
-        </div>
-      </section>
-
-      <section class="panel song-library" aria-labelledby="song-library-heading">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">Saved on this controller</p>
-            <h2 id="song-library-heading">Choose a song</h2>
-          </div>
-          <p id="library-status" class="library-status" aria-live="polite">Loading songs…</p>
-        </div>
-        <div id="song-list" class="song-list"></div>
-      </section>
-
-      <section class="panel playback-panel" aria-labelledby="playback-heading">
-        <div class="section-heading">
-          <div>
-            <p id="song-label" class="eyebrow">Fixed demonstration song</p>
-            <h2 id="playback-heading">Playback</h2>
-          </div>
-          <div class="status" aria-live="polite">
-            <span><small>Status</small><strong id="status">Loading…</strong></span>
-            <span><small>Position</small><strong id="position">0.000 s</strong></span>
-          </div>
-        </div>
-
-        <div class="controls" aria-label="Playback controls">
-          <button id="play-pause" class="button button--primary" type="button" disabled>Play</button>
-          <button id="restart" class="button" type="button" disabled>Restart</button>
-          <label class="field field--inline">
-            <span>Speed</span>
-            <select id="speed" disabled>
-              <option value="500">50%</option>
-              <option value="750" selected>75%</option>
-              <option value="1000">100%</option>
+          <label class="viewport-picker">
+            <span>Provisional viewport</span>
+            <select id="viewport-size">
+              <option value="320x240" selected>320 × 240</option>
+              <option value="480x320">480 × 320</option>
             </select>
           </label>
+        </div>
+
+        <div id="device-screen" class="device-screen" data-viewport="320x240">
+          <section id="screen-library" class="instrument-screen instrument-screen--library" aria-labelledby="library-heading">
+            <header class="screen-header">
+              <div>
+                <small>Songstick</small>
+                <h3 id="library-heading">Choose a song</h3>
+              </div>
+              <button id="open-manage" class="screen-button screen-button--quiet" type="button">Manage</button>
+            </header>
+            <div id="library-song-list" class="screen-song-list" role="list"></div>
+            <p id="library-status" class="screen-status" aria-live="polite">Loading songs…</p>
+          </section>
+
+          <section id="screen-player" class="instrument-screen instrument-screen--player" aria-labelledby="player-title" hidden>
+            <header class="screen-header screen-header--player">
+              <button id="player-back" class="screen-back" type="button">‹ Songs</button>
+              <h3 id="player-title">No song selected</h3>
+            </header>
+            <div class="player-main">
+              <p id="status" class="player-status">Choose a song</p>
+              <progress id="player-progress" max="1" value="0"></progress>
+              <p id="position" class="player-position">0.0 s</p>
+              <div class="player-controls">
+                <button id="restart" class="screen-icon-button" type="button" aria-label="Restart" title="Restart" disabled></button>
+                <button id="play-pause" class="screen-icon-button screen-icon-button--primary" type="button" aria-label="Play" title="Play" disabled></button>
+                <span class="player-controls__spacer" aria-hidden="true"></span>
+              </div>
+              <div class="tempo-control" aria-label="Playback tempo">
+                <button id="speed-down" type="button" aria-label="Reduce tempo" disabled>−</button>
+                <span><small>Tempo</small><strong id="speed-display">75%</strong></span>
+                <button id="speed-up" type="button" aria-label="Increase tempo" disabled>+</button>
+              </div>
+            </div>
+          </section>
+
+          <section id="screen-manage" class="instrument-screen instrument-screen--manage" aria-labelledby="manage-heading" hidden>
+            <header class="screen-header">
+              <button id="manage-back" class="screen-back" type="button">‹ Songs</button>
+              <h3 id="manage-heading">Manage songs</h3>
+              <label class="screen-import">
+                <span>Import</span>
+                <input id="midi-file" type="file" accept=".mid,.midi,audio/midi,audio/x-midi" />
+              </label>
+            </header>
+            <div id="manage-song-list" class="screen-song-list screen-song-list--manage" role="list"></div>
+            <p id="import-status" class="screen-status" aria-live="polite">Import a `.mid` or `.midi` file.</p>
+          </section>
+
+          <div id="delete-confirmation" class="screen-dialog" role="alertdialog" aria-modal="true" aria-labelledby="delete-heading" hidden>
+            <div class="screen-dialog__card">
+              <h3 id="delete-heading">Delete song?</h3>
+              <p id="delete-song-name"></p>
+              <div>
+                <button id="cancel-delete" class="screen-button screen-button--quiet" type="button">Cancel</button>
+                <button id="confirm-delete" class="screen-button screen-button--danger" type="button">Delete</button>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -156,10 +171,14 @@
       <details class="panel developer-panel">
         <summary>
           <span>
-            <strong>Developer snapshot</strong>
-            <small>Raw state, logical frame, and active strip configuration</small>
+            <strong>Import diagnostics and developer snapshot</strong>
+            <small>Simulator-only details outside the instrument screen</small>
           </span>
         </summary>
+        <div id="import-summary" class="import-summary" hidden>
+          <div id="import-summary-grid" class="import-summary__grid"></div>
+          <ul id="import-diagnostics" class="diagnostics" hidden></ul>
+        </div>
         <pre id="snapshot">Waiting for module…</pre>
       </details>
     </main>

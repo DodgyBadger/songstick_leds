@@ -1,9 +1,9 @@
 # Browser simulator
 
-The first integration harness lives under `web/`. It loads the C++ playback core
-through the generated Embind module and renders coarse state and LED snapshots
-for a fixed test song. It is architecture validation, not an approved product
-interface or visual design.
+The integration harness lives under `web/`. It loads the C++ playback core
+through the generated Embind module and renders playback state and LED output.
+The top-level web page frames a bounded mock instrument touchscreen above the
+virtual strip; it remains a prototype rather than approved final visual design.
 
 When requirements arrive, keep the domain/playback model independent from DOM
 rendering and transport. Treat the browser LED display as an adapter for the
@@ -31,12 +31,17 @@ are catalogued using their original names. Import adds a file to the library;
 the separate song selector lists, plays, and deletes stored files. Delete must
 require confirmation.
 Preserve the original import filename as catalog metadata; never show the opaque
-storage identifier as the normal song label. Keep each selector entry on one row
-with a very small icon-only Play control on the left. Use the pinned Lucide
-dependency for interface icons rather than text glyphs.
+storage identifier as the normal song label. The instrument UI uses explicit
+`library`, `player`, and `manage` screen states. Selecting a whole song row opens
+Player; do not put transport controls in the song list. Keep normal navigation
+full-screen and use an in-screen overlay only for confirmed deletion. Use the
+pinned Lucide dependency for interface icons rather than text glyphs.
 The prototype catalog also includes a known-good built-in MIDI demonstration
 song lasting at least 10 musical seconds. Mark it as built-in and do not offer
 Delete for it. Keep selector rows strictly single-line; omit secondary metadata
 instead of wrapping it beneath the filename.
+Keep detailed diagnostics, strip configuration, and other developer controls
+outside the bounded instrument screen. The 320×240 and 480×320 presets are
+provisional and must not be recorded as final hardware dimensions.
 TypeScript may display returned summaries and diagnostics but must not parse
 MIDI, resolve tempo, or assign fingerings.

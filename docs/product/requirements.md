@@ -1,7 +1,7 @@
 # Song Stick LED Teacher — Product Requirements Document
 
 **Status:** Initial draft
-**Version:** 0.7
+**Version:** 0.8
 **Date:** 2026-09-02
 **Project:** West End Maker Shed Song Stick
 **Development approach:** Simulation-first, shared portable C++ core
@@ -541,6 +541,24 @@ Design for touch:
 - Protection against accidental song changes during playback
 
 Support configurable viewport presets so the team can test likely touchscreen sizes before the exact hardware is known.
+
+The online prototype must present the player experience inside a bounded mock
+instrument screen above the separate virtual LED strip. It must optimize the
+interaction for a small touchscreen rather than expanding controls to fill the
+browser page. Use clearly provisional 320×240 and 480×320 viewport presets until
+the actual display is selected.
+
+Break the instrument interaction into explicit full-screen states:
+
+- **Songs:** a simple list where selecting a row opens that song's player;
+- **Player:** song title, Play/Pause, Restart, progress, and tempo adjustment;
+- **Manage:** MIDI import and confirmed deletion of imported songs.
+
+Selecting a song prepares it but does not start playback. The Player screen owns
+all transport and tempo controls; do not repeat Play controls in the song list.
+Use an overlay only for a focused confirmation such as permanent deletion, not
+for ordinary navigation. Keep simulator configuration and detailed import/debug
+information outside the mock instrument screen.
 
 ### 9.2 Developer panel
 

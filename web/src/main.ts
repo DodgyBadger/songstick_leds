@@ -1,24 +1,16 @@
 import './styles.css';
 import createSongstickModule from './generated/songstick.js';
-import { createElement as createIconElement, Play } from 'lucide';
+import { createElement as createIconElement, Pause, Play, RotateCcw, Trash2 } from 'lucide';
 import {
-  defaultLedStripConfig,
-  formatMapping,
-  mapLogicalFrame,
-  parseLedStripConfig,
-  physicalLedCount,
-  type LedStripConfig,
-  type LogicalLedFrame,
+  defaultLedStripConfig, formatMapping, mapLogicalFrame, parseLedStripConfig, physicalLedCount,
+  type LedStripConfig, type LogicalLedFrame,
 } from './led-strip';
 import {
-  deleteSavedMidiFile,
-  listSavedMidiFiles,
-  loadSavedMidiFile,
-  saveMidiFile,
-  type StoredMidiFile,
+  deleteSavedMidiFile, listSavedMidiFiles, loadSavedMidiFile, saveMidiFile, type StoredMidiFile,
 } from './midi-file-client';
 
 type PlaybackStatus = 'stopped' | 'playing' | 'paused' | 'finished';
+type ScreenName = 'library' | 'player' | 'manage';
 
 interface PlaybackSnapshot {
   status: PlaybackStatus;
@@ -27,7 +19,6 @@ interface PlaybackSnapshot {
   currentEvent: number;
   nextEvent: number;
 }
-
 interface WasmPlayback {
   loadDemoSong(): boolean;
   play(): void;
@@ -40,7 +31,6 @@ interface WasmPlayback {
   ledFrame(): LogicalLedFrame;
   delete(): void;
 }
-
 interface MidiImportSummary {
   format: number;
   ticksPerQuarter: number;
@@ -54,24 +44,19 @@ interface MidiImportSummary {
   timeSignatureNumerator: number;
   timeSignatureDenominator: number;
 }
-
 interface MidiDiagnostic {
   severity: 'warning' | 'error';
   code: string;
   message: string;
   tick: number;
 }
-
 interface MidiImportResult {
   success: boolean;
   instrumentProfileId: string;
   summary: MidiImportSummary;
   diagnostics: MidiDiagnostic[];
 }
-
-interface SongstickModule {
-  Playback: new () => WasmPlayback;
-}
+interface SongstickModule { Playback: new () => WasmPlayback; }
 
 const required = <T extends Element>(selector: string): T => {
   const element = document.querySelector<T>(selector);
@@ -79,11 +64,37 @@ const required = <T extends Element>(selector: string): T => {
   return element;
 };
 
+const screens: Record<ScreenName, HTMLElement> = {
+  library: required('#screen-library'),
+  player: required('#screen-player'),
+  manage: required('#screen-manage'),
+};
+const deviceScreen = required<HTMLElement>('#device-screen');
+const viewportSize = required<HTMLSelectElement>('#viewport-size');
+const librarySongList = required<HTMLElement>('#library-song-list');
+const manageSongList = required<HTMLElement>('#manage-song-list');
+const libraryStatus = required<HTMLElement>('#library-status');
+const openManage = required<HTMLButtonElement>('#open-manage');
+const manageBack = required<HTMLButtonElement>('#manage-back');
+const playerBack = required<HTMLButtonElement>('#player-back');
+const playerTitle = required<HTMLElement>('#player-title');
 const playPause = required<HTMLButtonElement>('#play-pause');
 const restart = required<HTMLButtonElement>('#restart');
-const speed = required<HTMLSelectElement>('#speed');
+const speedDown = required<HTMLButtonElement>('#speed-down');
+const speedUp = required<HTMLButtonElement>('#speed-up');
+const speedDisplay = required<HTMLElement>('#speed-display');
 const statusText = required<HTMLElement>('#status');
 const positionText = required<HTMLElement>('#position');
+const playerProgress = required<HTMLProgressElement>('#player-progress');
+const midiFileInput = required<HTMLInputElement>('#midi-file');
+const importStatus = required<HTMLElement>('#import-status');
+const deleteConfirmation = required<HTMLElement>('#delete-confirmation');
+const deleteSongName = required<HTMLElement>('#delete-song-name');
+const cancelDelete = required<HTMLButtonElement>('#cancel-delete');
+const confirmDelete = required<HTMLButtonElement>('#confirm-delete');
+const importSummary = required<HTMLElement>('#import-summary');
+const importSummaryGrid = required<HTMLElement>('#import-summary-grid');
+const importDiagnostics = required<HTMLElement>('#import-diagnostics');
 const stripElement = required<HTMLElement>('#led-strip');
 const stripSummary = required<HTMLElement>('#strip-summary');
 const snapshotElement = required<HTMLElement>('#snapshot');
@@ -96,23 +107,27 @@ const controllerInput = required<HTMLInputElement>('#controller');
 const openMappingInput = required<HTMLInputElement>('#open-index-mapping');
 const mappingInput = required<HTMLTextAreaElement>('#index-mapping');
 const resetConfig = required<HTMLButtonElement>('#reset-config');
-const midiFileInput = required<HTMLInputElement>('#midi-file');
-const importStatus = required<HTMLElement>('#import-status');
-const importSummary = required<HTMLElement>('#import-summary');
-const importSummaryGrid = required<HTMLElement>('#import-summary-grid');
-const importDiagnostics = required<HTMLElement>('#import-diagnostics');
-const songLabel = required<HTMLElement>('#song-label');
-const songList = required<HTMLElement>('#song-list');
-const libraryStatus = required<HTMLElement>('#library-status');
 
 const module = (await createSongstickModule()) as SongstickModule;
 const playback = new module.Playback();
-
-if (!playback.loadDemoSong()) {
-  throw new Error('The fixed integration song was rejected by the portable core.');
-}
+if (!playback.loadDemoSong()) throw new Error('The fixed integration song was rejected by the portable core.');
 
 let stripConfig = defaultLedStripConfig();
+let songs: StoredMidiFile[] = [];
+let activeSong: StoredMidiFile | null = null;
+let activeDurationMicroseconds = 0;
+let pendingDelete: StoredMidiFile | null = null;
+let renderedPlaybackStatus: PlaybackStatus | null = null;
+
+const icon = (iconNode: Parameters<typeof createIconElement>[0], size: number): SVGElement =>
+  createIconElement(iconNode, {
+    width: String(size), height: String(size), 'stroke-width': '2.25', 'aria-hidden': 'true',
+  });
+restart.append(icon(RotateCcw, 15));
+
+const showScreen = (name: ScreenName): void => {
+  for (const [screenName, screen] of Object.entries(screens)) screen.hidden = screenName !== name;
+};
 
 const populateConfigForm = (config: LedStripConfig): void => {
   fretCountInput.value = String(config.fretCount);
@@ -122,17 +137,12 @@ const populateConfigForm = (config: LedStripConfig): void => {
   openMappingInput.value = config.openLedIndexes.join(',');
   mappingInput.value = formatMapping(config.fretToLedIndexes);
 };
-
 populateConfigForm(stripConfig);
-playPause.disabled = false;
-restart.disabled = false;
-speed.disabled = false;
 
 const midiNoteName = (pitch: number): string => {
   const names = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
   return `${names[pitch % 12]}${Math.floor(pitch / 12) - 1}`;
 };
-
 const summaryItem = (label: string, value: string): HTMLElement => {
   const item = document.createElement('span');
   const small = document.createElement('small');
@@ -142,33 +152,20 @@ const summaryItem = (label: string, value: string): HTMLElement => {
   item.append(small, strong);
   return item;
 };
-
-const renderImportResult = (filename: string, result: MidiImportResult): void => {
+const renderImportDetails = (result: MidiImportResult): void => {
   const summary = result.summary;
   importSummary.hidden = false;
-  importStatus.textContent = result.success
-    ? `${filename} was loaded and is playing.`
-    : `${filename} is stored, but could not be converted for playback.`;
-  importStatus.className = result.success ? 'import-status import-status--success' : 'import-status import-status--error';
-
-  const pitchRange = summary.noteCount === 0
-    ? '—'
-    : `${midiNoteName(summary.minimumPitch)}–${midiNoteName(summary.maximumPitch)}`;
-  const timeSignature = summary.timeSignatureNumerator === 0
-    ? 'Not specified'
-    : `${summary.timeSignatureNumerator}/${summary.timeSignatureDenominator}`;
   importSummaryGrid.replaceChildren(
     summaryItem('Track', summary.trackName || 'Unnamed'),
     summaryItem('Format', String(summary.format)),
     summaryItem('Duration', `${(summary.durationMicroseconds / 1_000_000).toFixed(2)} s`),
     summaryItem('Notes', String(summary.noteCount)),
-    summaryItem('Pitch range', pitchRange),
+    summaryItem('Pitch range', summary.noteCount === 0 ? '—' : `${midiNoteName(summary.minimumPitch)}–${midiNoteName(summary.maximumPitch)}`),
     summaryItem('PPQN', String(summary.ticksPerQuarter || '—')),
     summaryItem('Tempo events', String(summary.tempoChangeCount)),
-    summaryItem('Time signature', timeSignature),
+    summaryItem('Time signature', summary.timeSignatureNumerator === 0 ? 'Not specified' : `${summary.timeSignatureNumerator}/${summary.timeSignatureDenominator}`),
   );
-
-  const diagnosticElements = result.diagnostics.map((diagnostic) => {
+  const diagnostics = result.diagnostics.map((diagnostic) => {
     const item = document.createElement('li');
     item.className = `diagnostic diagnostic--${diagnostic.severity}`;
     const code = document.createElement('code');
@@ -178,93 +175,98 @@ const renderImportResult = (filename: string, result: MidiImportResult): void =>
     item.append(code, message);
     return item;
   });
-  importDiagnostics.replaceChildren(...diagnosticElements);
-  importDiagnostics.hidden = diagnosticElements.length === 0;
-
-  if (result.success) {
-    songLabel.textContent = summary.trackName || filename;
-    speed.value = '750';
-    playback.play();
-    render();
-  }
+  importDiagnostics.replaceChildren(...diagnostics);
+  importDiagnostics.hidden = diagnostics.length === 0;
 };
 
-const playSavedSong = async (song: StoredMidiFile): Promise<void> => {
-  importStatus.className = 'import-status';
-  importStatus.textContent = `Loading ${song.originalName}…`;
+const setPlayerEnabled = (enabled: boolean): void => {
+  playPause.disabled = !enabled;
+  restart.disabled = !enabled;
+  speedDown.disabled = !enabled;
+  speedUp.disabled = !enabled;
+};
+const selectSong = async (song: StoredMidiFile): Promise<void> => {
+  activeSong = null;
+  activeDurationMicroseconds = 0;
+  playerTitle.textContent = song.originalName;
+  playerTitle.title = song.originalName;
+  statusText.textContent = 'Loading…';
+  setPlayerEnabled(false);
+  showScreen('player');
   try {
-    renderImportResult(song.originalName, playback.importMidi(await loadSavedMidiFile(song.id)));
+    const result = playback.importMidi(await loadSavedMidiFile(song.id));
+    renderImportDetails(result);
+    if (!result.success) {
+      statusText.textContent = result.diagnostics[0]?.message ?? 'This song cannot be played.';
+      return;
+    }
+    activeSong = song;
+    activeDurationMicroseconds = result.summary.durationMicroseconds;
+    playback.setSpeedPermille(750);
+    statusText.textContent = 'Ready';
+    setPlayerEnabled(true);
+    render();
   } catch (error) {
-    importStatus.className = 'import-status import-status--error';
-    importStatus.textContent = error instanceof Error ? error.message : 'The saved MIDI file could not be loaded.';
+    statusText.textContent = error instanceof Error ? error.message : 'The song could not be loaded.';
   }
 };
 
-const renderSongLibrary = (songs: StoredMidiFile[]): void => {
-  if (songs.length === 0) {
-    const empty = document.createElement('p');
-    empty.className = 'song-library__empty';
-    empty.textContent = 'No MIDI songs have been imported yet.';
-    songList.replaceChildren(empty);
-    return;
+const libraryRow = (song: StoredMidiFile): HTMLElement => {
+  const row = document.createElement('button');
+  row.className = 'screen-song-row';
+  row.type = 'button';
+  row.setAttribute('role', 'listitem');
+  row.title = song.originalName;
+  const title = document.createElement('span');
+  title.textContent = song.originalName;
+  row.append(title);
+  if (song.builtIn) {
+    const badge = document.createElement('small');
+    badge.textContent = 'Built in';
+    row.append(badge);
   }
-
-  songList.replaceChildren(...songs.map((song) => {
-    const item = document.createElement('article');
-    item.className = 'song-item';
-    const details = document.createElement('div');
-    const title = document.createElement('strong');
-    title.textContent = song.originalName;
-    title.title = song.originalName;
-    if (song.builtIn) {
-      const badge = document.createElement('span');
-      badge.className = 'song-item__badge';
-      badge.textContent = 'Built in';
-      title.append(' ', badge);
-    }
-    details.append(title);
-
-    const playButton = document.createElement('button');
-    playButton.className = 'song-item__play';
-    playButton.type = 'button';
-    playButton.setAttribute('aria-label', `Play ${song.originalName}`);
-    playButton.title = `Play ${song.originalName}`;
-    playButton.append(createIconElement(Play, {
-      width: '13',
-      height: '13',
-      'stroke-width': '2.25',
-      'aria-hidden': 'true',
-    }));
-    playButton.addEventListener('click', () => void playSavedSong(song));
-    item.append(playButton, details);
-    if (!song.builtIn) {
-      const deleteButton = document.createElement('button');
-      deleteButton.className = 'button button--danger song-item__delete';
-      deleteButton.type = 'button';
-      deleteButton.textContent = 'Delete';
-      deleteButton.addEventListener('click', async () => {
-        if (!window.confirm(`Delete ${song.originalName}?`)) return;
-        try {
-          await deleteSavedMidiFile(song.id);
-          libraryStatus.textContent = `${song.originalName} was deleted.`;
-          await refreshSongLibrary();
-        } catch (error) {
-          libraryStatus.textContent = error instanceof Error ? error.message : 'The song could not be deleted.';
-        }
-      });
-      item.append(deleteButton);
-    }
-    return item;
-  }));
+  row.addEventListener('click', () => void selectSong(song));
+  return row;
 };
-
+const openDeleteConfirmation = (song: StoredMidiFile): void => {
+  pendingDelete = song;
+  deleteSongName.textContent = song.originalName;
+  deleteConfirmation.hidden = false;
+  cancelDelete.focus();
+};
+const manageRow = (song: StoredMidiFile): HTMLElement => {
+  const row = document.createElement('div');
+  row.className = 'screen-song-row screen-song-row--manage';
+  row.setAttribute('role', 'listitem');
+  const title = document.createElement('span');
+  title.textContent = song.originalName;
+  title.title = song.originalName;
+  row.append(title);
+  if (song.builtIn) {
+    const badge = document.createElement('small');
+    badge.textContent = 'Built in';
+    row.append(badge);
+  } else {
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'screen-delete';
+    deleteButton.type = 'button';
+    deleteButton.setAttribute('aria-label', `Delete ${song.originalName}`);
+    deleteButton.title = `Delete ${song.originalName}`;
+    deleteButton.append(icon(Trash2, 13));
+    deleteButton.addEventListener('click', () => openDeleteConfirmation(song));
+    row.append(deleteButton);
+  }
+  return row;
+};
+const renderSongLists = (): void => {
+  librarySongList.replaceChildren(...songs.map(libraryRow));
+  manageSongList.replaceChildren(...songs.map(manageRow));
+};
 const refreshSongLibrary = async (): Promise<void> => {
   try {
-    const songs = await listSavedMidiFiles();
-    renderSongLibrary(songs);
-    if (!libraryStatus.textContent) {
-      libraryStatus.textContent = `${songs.length} ${songs.length === 1 ? 'song' : 'songs'} available.`;
-    }
+    songs = await listSavedMidiFiles();
+    renderSongLists();
+    libraryStatus.textContent = `${songs.length} ${songs.length === 1 ? 'song' : 'songs'} available`;
   } catch (error) {
     libraryStatus.textContent = error instanceof Error ? error.message : 'The song library could not be loaded.';
   }
@@ -275,38 +277,25 @@ const renderStrip = (frame: LogicalLedFrame): void => {
   const elements = physicalFrame.map((led) => {
     const wrapper = document.createElement('div');
     wrapper.className = `physical-led physical-led--${led.role}${led.open ? ' physical-led--open' : ''}`;
-    wrapper.setAttribute(
-      'aria-label',
-      led.active
-        ? `LED ${led.index}, ${led.open ? 'open position' : `fret ${led.frets.join(', ')}`}, ${led.role}, string ${(led.stringIndex ?? 0) + 1}`
-        : `LED ${led.index}, ${led.open ? 'open position' : led.frets.length ? `fret ${led.frets.join(', ')}` : 'unmapped'}, off`,
-    );
-
+    wrapper.setAttribute('aria-label', led.active
+      ? `LED ${led.index}, ${led.open ? 'open position' : `fret ${led.frets.join(', ')}`}, ${led.role}, string ${(led.stringIndex ?? 0) + 1}`
+      : `LED ${led.index}, ${led.open ? 'open position' : led.frets.length ? `fret ${led.frets.join(', ')}` : 'unmapped'}, off`);
     const index = document.createElement('span');
     index.className = 'physical-led__index';
     index.textContent = `#${led.index}`;
-
     const light = document.createElement('span');
     light.className = 'physical-led__light';
     light.style.setProperty('--led-color', led.color);
     light.style.setProperty('--led-level', String(led.intensityPermille / 1000));
-
     const fret = document.createElement('span');
     fret.className = 'physical-led__fret';
     fret.textContent = led.open ? 'OPEN' : led.frets.length ? `F${led.frets.join(',')}` : '—';
-
     wrapper.append(index, light, fret);
     return wrapper;
   });
   stripElement.replaceChildren(...elements);
-  stripElement.setAttribute(
-    'aria-label',
-    `Simulated RGB strip with ${physicalFrame.length} physical LEDs mapped across ${stripConfig.fretCount} frets`,
-  );
-
-  const density = stripConfig.ledsPerMeter === null
-    ? 'density unspecified'
-    : `${stripConfig.ledsPerMeter} LEDs/m`;
+  stripElement.setAttribute('aria-label', `Simulated RGB strip with ${physicalFrame.length} physical LEDs mapped across ${stripConfig.fretCount} frets`);
+  const density = stripConfig.ledsPerMeter === null ? 'density unspecified' : `${stripConfig.ledsPerMeter} LEDs/m`;
   const controller = stripConfig.controller ?? 'controller unspecified';
   stripSummary.textContent = `${physicalLedCount(stripConfig)} physical LEDs · shared open indicator · ${stripConfig.fretCount} frets · ${stripConfig.ledsPerFret} LED/fret · RGB · ${density} · ${controller}`;
 };
@@ -314,66 +303,104 @@ const renderStrip = (frame: LogicalLedFrame): void => {
 const render = (): void => {
   const state = playback.state();
   const frame = playback.ledFrame();
-
-  statusText.textContent = state.status;
-  positionText.textContent = `${(state.positionMicroseconds / 1_000_000).toFixed(3)} s`;
-  playPause.textContent = state.status === 'playing' ? 'Pause' : 'Play';
+  if (activeSong) statusText.textContent = state.status === 'stopped' ? 'Ready' : state.status;
+  positionText.textContent = `${(state.positionMicroseconds / 1_000_000).toFixed(1)} s`;
+  speedDisplay.textContent = `${Math.round(state.speedPermille / 10)}%`;
+  playerProgress.max = Math.max(1, activeDurationMicroseconds);
+  playerProgress.value = Math.min(state.positionMicroseconds, activeDurationMicroseconds);
+  speedDown.disabled = !activeSong || state.speedPermille <= 500;
+  speedUp.disabled = !activeSong || state.speedPermille >= 1000;
+  if (renderedPlaybackStatus !== state.status) {
+    const playing = state.status === 'playing';
+    playPause.replaceChildren(icon(playing ? Pause : Play, 22));
+    playPause.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+    playPause.title = playing ? 'Pause' : 'Play';
+    renderedPlaybackStatus = state.status;
+  }
   renderStrip(frame);
-  snapshotElement.textContent = JSON.stringify({ state, logicalFrame: frame, stripConfig }, null, 2);
+  snapshotElement.textContent = JSON.stringify({ state, logicalFrame: frame, stripConfig, activeSong }, null, 2);
 };
 
+openManage.addEventListener('click', () => showScreen('manage'));
+manageBack.addEventListener('click', () => showScreen('library'));
+playerBack.addEventListener('click', () => showScreen('library'));
+viewportSize.addEventListener('change', () => { deviceScreen.dataset.viewport = viewportSize.value; });
 playPause.addEventListener('click', () => {
-  if (playback.state().status === 'playing') playback.pause();
-  else playback.play();
+  const state = playback.state();
+  if (state.status === 'playing') playback.pause();
+  else {
+    if (state.status === 'finished') playback.restart();
+    playback.play();
+  }
   render();
 });
-
-restart.addEventListener('click', () => {
-  playback.restart();
+restart.addEventListener('click', () => { playback.restart(); render(); });
+const changeSpeed = (difference: number): void => {
+  const next = Math.max(500, Math.min(1000, playback.state().speedPermille + difference));
+  playback.setSpeedPermille(next);
   render();
-});
-
-speed.addEventListener('change', () => {
-  playback.setSpeedPermille(Number(speed.value));
-  render();
-});
+};
+speedDown.addEventListener('click', () => changeSpeed(-100));
+speedUp.addEventListener('click', () => changeSpeed(100));
 
 midiFileInput.addEventListener('change', async () => {
   const file = midiFileInput.files?.[0];
   if (!file) return;
-  importStatus.className = 'import-status';
-  importStatus.textContent = `Saving ${file.name}…`;
+  importStatus.className = 'screen-status';
+  importStatus.textContent = `Importing ${file.name}…`;
   try {
     const stored = await saveMidiFile(file);
-    importStatus.className = 'import-status import-status--success';
-    importStatus.textContent = `${stored.originalName} was imported into the song library.`;
-    libraryStatus.textContent = '';
+    importStatus.className = 'screen-status screen-status--success';
+    importStatus.textContent = `${stored.originalName} imported.`;
     await refreshSongLibrary();
   } catch (error) {
-    importStatus.className = 'import-status import-status--error';
-    importStatus.textContent = error instanceof Error ? error.message : 'The MIDI import failed unexpectedly.';
+    importStatus.className = 'screen-status screen-status--error';
+    importStatus.textContent = error instanceof Error ? error.message : 'The MIDI import failed.';
+  } finally {
+    midiFileInput.value = '';
+  }
+});
+cancelDelete.addEventListener('click', () => {
+  pendingDelete = null;
+  deleteConfirmation.hidden = true;
+});
+confirmDelete.addEventListener('click', async () => {
+  if (!pendingDelete) return;
+  const song = pendingDelete;
+  confirmDelete.disabled = true;
+  try {
+    await deleteSavedMidiFile(song.id);
+    if (activeSong?.id === song.id) {
+      activeSong = null;
+      activeDurationMicroseconds = 0;
+      setPlayerEnabled(false);
+    }
+    importStatus.className = 'screen-status screen-status--success';
+    importStatus.textContent = `${song.originalName} deleted.`;
+    pendingDelete = null;
+    deleteConfirmation.hidden = true;
+    await refreshSongLibrary();
+  } catch (error) {
+    importStatus.className = 'screen-status screen-status--error';
+    importStatus.textContent = error instanceof Error ? error.message : 'The song could not be deleted.';
+    deleteConfirmation.hidden = true;
+  } finally {
+    confirmDelete.disabled = false;
   }
 });
 
 configForm.addEventListener('submit', (event) => {
   event.preventDefault();
   const result = parseLedStripConfig({
-    fretCount: fretCountInput.value,
-    ledsPerFret: ledsPerFretInput.value,
-    ledsPerMeter: ledsPerMeterInput.value,
-    controller: controllerInput.value,
-    openMapping: openMappingInput.value,
-    mapping: mappingInput.value,
+    fretCount: fretCountInput.value, ledsPerFret: ledsPerFretInput.value,
+    ledsPerMeter: ledsPerMeterInput.value, controller: controllerInput.value,
+    openMapping: openMappingInput.value, mapping: mappingInput.value,
   });
-  if (!result.ok) {
-    configError.textContent = result.error;
-    return;
-  }
+  if (!result.ok) { configError.textContent = result.error; return; }
   configError.textContent = '';
   stripConfig = result.config;
   render();
 });
-
 resetConfig.addEventListener('click', () => {
   stripConfig = defaultLedStripConfig();
   populateConfigForm(stripConfig);
@@ -386,7 +413,8 @@ const update = (timestampMilliseconds: number): void => {
   render();
   requestAnimationFrame(update);
 };
-
+setPlayerEnabled(false);
+showScreen('library');
 window.addEventListener('pagehide', () => playback.delete(), { once: true });
 render();
 void refreshSongLibrary();

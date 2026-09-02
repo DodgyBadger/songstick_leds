@@ -49,11 +49,13 @@ the browser. Playback and logical LED snapshots remain authoritative C++/WASM
 output. The current screen is still an evolving simulator, not an approved
 touchscreen design.
 
-The simulator can also import MIDI files into a persistent development song
-library under ignored `var/midi-uploads/`. The separate song selector lists the
-stored files alongside a non-deletable built-in demo and provides Play and
-confirmed Delete actions for imports. Play reloads the
-saved bytes before passing them to the portable C++ core. This storage endpoint
+The simulator models a small instrument touchscreen above the virtual LED strip,
+with separate Songs, Player, and Manage screens. Selecting a stored song opens
+Player, where Play/Pause, Restart, progress, and tempo controls live. Manage
+imports MIDI files into a persistent development library under ignored
+`var/midi-uploads/` and provides confirmed deletion. A non-deletable built-in
+demo is always available. Selecting a song reloads its saved bytes before
+passing them to the portable C++ core. This storage endpoint
 exists only in the Vite development/preview server and is not part of the static
 build. Parsing, tempo resolution, validation, and provisional A-Mixolydian
 fingering all run in the portable C++ core. Format 1, polyphony reduction, and
