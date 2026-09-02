@@ -51,7 +51,8 @@ touchscreen design.
 
 The simulator can also import MIDI files into a persistent development song
 library under ignored `var/midi-uploads/`. The separate song selector lists the
-stored files and provides Play and confirmed Delete actions. Play reloads the
+stored files alongside a non-deletable built-in demo and provides Play and
+confirmed Delete actions for imports. Play reloads the
 saved bytes before passing them to the portable C++ core. This storage endpoint
 exists only in the Vite development/preview server and is not part of the static
 build. Parsing, tempo resolution, validation, and provisional A-Mixolydian

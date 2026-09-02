@@ -191,6 +191,11 @@ The browser simulator must exercise this workflow with development storage. The
 ESP32 filesystem, metadata representation, capacity, and provisioning transport
 remain separate platform decisions.
 
+For the prototype, the selector must always include a playable built-in test
+song. It must be visibly distinguished from imported songs and cannot be
+deleted. This guarantees a known-good demonstration path without requiring an
+upload.
+
 ### 8.1 Instrument profile
 
 The instrument definition must be configurable and contain at least:

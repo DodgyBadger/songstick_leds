@@ -30,5 +30,7 @@ debugging adapter and is absent from a standalone static production build. Files
 are catalogued using their original names. Import adds a file to the library;
 the separate song selector lists, plays, and deletes stored files. Delete must
 require confirmation.
+The prototype catalog also includes a known-good built-in MIDI demonstration
+song. Mark it as built-in and do not offer Delete for it.
 TypeScript may display returned summaries and diagnostics but must not parse
 MIDI, resolve tempo, or assign fingerings.

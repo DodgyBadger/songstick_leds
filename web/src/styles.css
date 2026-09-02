@@ -214,6 +214,18 @@ textarea {
   overflow-wrap: anywhere;
 }
 
+.song-item__badge {
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0.08rem 0.4rem;
+  color: #9dd0ff;
+  background: #1b3042;
+  border-radius: 99rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  vertical-align: 0.1rem;
+}
+
 .song-item small {
   color: #82909b;
 }

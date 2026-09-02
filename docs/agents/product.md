@@ -17,6 +17,8 @@ Keep its assumptions distinct from confirmed facts.
 - Song import and song selection are separate steps. The selector lists stored
   MIDI files and provides Play and confirmed Delete actions.
 - MIDI import accepts `.mid` and `.midi` filename extensions and rejects others.
+- The prototype song selector always includes a non-deletable, playable built-in
+  test song.
 - A shareable browser simulator will support development and feedback without
   repeatedly flashing hardware.
 - The provisional simulator profile uses RGB, 12 frets, and one LED per fret.

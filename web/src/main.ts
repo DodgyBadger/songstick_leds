@@ -218,8 +218,16 @@ const renderSongLibrary = (songs: StoredMidiFile[]): void => {
     const details = document.createElement('div');
     const title = document.createElement('strong');
     title.textContent = song.originalName;
+    if (song.builtIn) {
+      const badge = document.createElement('span');
+      badge.className = 'song-item__badge';
+      badge.textContent = 'Built in';
+      title.append(' ', badge);
+    }
     const metadata = document.createElement('small');
-    metadata.textContent = `${formatFileSize(song.size)} · imported ${new Date(song.uploadedAt).toLocaleString()}`;
+    metadata.textContent = song.builtIn
+      ? `${formatFileSize(song.size)} · always available`
+      : `${formatFileSize(song.size)} · imported ${new Date(song.uploadedAt).toLocaleString()}`;
     details.append(title, metadata);
 
     const actions = document.createElement('div');
@@ -229,21 +237,24 @@ const renderSongLibrary = (songs: StoredMidiFile[]): void => {
     playButton.type = 'button';
     playButton.textContent = 'Play';
     playButton.addEventListener('click', () => void playSavedSong(song));
-    const deleteButton = document.createElement('button');
-    deleteButton.className = 'button button--danger';
-    deleteButton.type = 'button';
-    deleteButton.textContent = 'Delete';
-    deleteButton.addEventListener('click', async () => {
-      if (!window.confirm(`Delete ${song.originalName}?`)) return;
-      try {
-        await deleteSavedMidiFile(song.id);
-        libraryStatus.textContent = `${song.originalName} was deleted.`;
-        await refreshSongLibrary();
-      } catch (error) {
-        libraryStatus.textContent = error instanceof Error ? error.message : 'The song could not be deleted.';
-      }
-    });
-    actions.append(playButton, deleteButton);
+    actions.append(playButton);
+    if (!song.builtIn) {
+      const deleteButton = document.createElement('button');
+      deleteButton.className = 'button button--danger';
+      deleteButton.type = 'button';
+      deleteButton.textContent = 'Delete';
+      deleteButton.addEventListener('click', async () => {
+        if (!window.confirm(`Delete ${song.originalName}?`)) return;
+        try {
+          await deleteSavedMidiFile(song.id);
+          libraryStatus.textContent = `${song.originalName} was deleted.`;
+          await refreshSongLibrary();
+        } catch (error) {
+          libraryStatus.textContent = error instanceof Error ? error.message : 'The song could not be deleted.';
+        }
+      });
+      actions.append(deleteButton);
+    }
     item.append(details, actions);
     return item;
   }));

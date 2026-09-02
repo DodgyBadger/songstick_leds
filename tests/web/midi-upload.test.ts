@@ -4,7 +4,11 @@ import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { createMidiUploadMiddleware, MIDI_UPLOAD_ROUTE } from '../../dev/midi-upload-plugin.ts';
+import {
+  BUILT_IN_SONG,
+  createMidiUploadMiddleware,
+  MIDI_UPLOAD_ROUTE,
+} from '../../dev/midi-upload-plugin.ts';
 
 const midiBytes = Buffer.from([
   0x4d, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06,
@@ -40,7 +44,7 @@ test('persists an uploaded MIDI file and serves the saved bytes', async () => {
 
     const listing = await fetch(`${baseUrl}${MIDI_UPLOAD_ROUTE}`);
     assert.equal(listing.status, 200);
-    assert.deepEqual(await listing.json(), { songs: [record] });
+    assert.deepEqual(await listing.json(), { songs: [BUILT_IN_SONG, record] });
 
     const download = await fetch(`${baseUrl}${MIDI_UPLOAD_ROUTE}/${record.id}`);
     assert.equal(download.status, 200);
@@ -49,7 +53,13 @@ test('persists an uploaded MIDI file and serves the saved bytes', async () => {
     const deletion = await fetch(`${baseUrl}${MIDI_UPLOAD_ROUTE}/${record.id}`, { method: 'DELETE' });
     assert.equal(deletion.status, 204);
     await assert.rejects(readFile(path.join(uploadDirectory, record.id)));
-    assert.deepEqual(await (await fetch(`${baseUrl}${MIDI_UPLOAD_ROUTE}`)).json(), { songs: [] });
+    assert.deepEqual(await (await fetch(`${baseUrl}${MIDI_UPLOAD_ROUTE}`)).json(), { songs: [BUILT_IN_SONG] });
+
+    const builtInDownload = await fetch(`${baseUrl}${MIDI_UPLOAD_ROUTE}/${BUILT_IN_SONG.id}`);
+    assert.equal(builtInDownload.status, 200);
+    assert.equal((await builtInDownload.arrayBuffer()).byteLength, BUILT_IN_SONG.size);
+    const builtInDeletion = await fetch(`${baseUrl}${MIDI_UPLOAD_ROUTE}/${BUILT_IN_SONG.id}`, { method: 'DELETE' });
+    assert.equal(builtInDeletion.status, 409);
   } finally {
     await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
     await rm(uploadDirectory, { recursive: true, force: true });

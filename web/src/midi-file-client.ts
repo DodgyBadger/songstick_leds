@@ -3,6 +3,7 @@ export interface StoredMidiFile {
   originalName: string;
   size: number;
   uploadedAt: string;
+  builtIn?: boolean;
 }
 
 const errorMessage = async (response: Response): Promise<string> => {

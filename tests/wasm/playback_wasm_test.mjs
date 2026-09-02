@@ -1,5 +1,6 @@
 import createSongstickModule from '../../build/wasm/songstick.js';
 import { readFile } from 'node:fs/promises';
+import { builtInMidiBytes } from '../../dev/midi-upload-plugin.ts';
 
 const wasmBinary = await readFile(new URL('../../build/wasm/songstick.wasm', import.meta.url));
 const module = await createSongstickModule({ wasmBinary });
@@ -82,6 +83,11 @@ try {
   assert(openString.success, 'provisional A2 open string should import');
   assert(openString.instrumentProfileId === 'provisional-a-mixolydian-v2', 'open profile version should cross the boundary');
   assert(playback.ledFrame().current.fret === 0, 'imported A2 should map to logical open');
+
+  const builtInDemo = playback.importMidi(builtInMidiBytes);
+  assert(builtInDemo.success, 'built-in catalog demo should remain compatible');
+  assert(builtInDemo.summary.trackName === 'Songstick Demo', 'built-in demo title should cross the boundary');
+  assert(builtInDemo.summary.noteCount === 2, 'built-in demo should contain two playable notes');
 
   console.log('WebAssembly playback integration passed');
 } finally {

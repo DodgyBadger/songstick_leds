@@ -12,9 +12,28 @@ export interface StoredMidiFile {
   originalName: string;
   size: number;
   uploadedAt: string;
+  builtIn?: boolean;
 }
 
 const storedIdPattern = /^\d+-[0-9a-f-]{36}\.mid$/;
+export const builtInMidiBytes = Buffer.from([
+  0x4d, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06,
+  0x00, 0x00, 0x00, 0x01, 0x00, 0x60,
+  0x4d, 0x54, 0x72, 0x6b, 0x00, 0x00, 0x00, 0x2d,
+  0x00, 0xff, 0x03, 0x0e,
+  0x53, 0x6f, 0x6e, 0x67, 0x73, 0x74, 0x69, 0x63, 0x6b, 0x20, 0x44, 0x65, 0x6d, 0x6f,
+  0x00, 0xff, 0x51, 0x03, 0x07, 0xa1, 0x20,
+  0x00, 0x90, 0x2d, 0x64, 0x60, 0x80, 0x2d, 0x00,
+  0x00, 0x90, 0x32, 0x64, 0x60, 0x80, 0x32, 0x00,
+  0x00, 0xff, 0x2f, 0x00,
+]);
+export const BUILT_IN_SONG: StoredMidiFile = {
+  id: 'built-in-songstick-demo.mid',
+  originalName: 'Songstick Demo.mid',
+  size: builtInMidiBytes.length,
+  uploadedAt: '2026-09-02T00:00:00.000Z',
+  builtIn: true,
+};
 const metadataPath = (uploadDirectory: string, id: string): string =>
   path.join(uploadDirectory, `${id}.json`);
 
@@ -47,6 +66,14 @@ const sendJson = (response: ServerResponse, status: number, body: unknown): void
   response.setHeader('Content-Type', 'application/json; charset=utf-8');
   response.setHeader('Cache-Control', 'no-store');
   response.end(JSON.stringify(body));
+};
+
+const sendMidi = (response: ServerResponse, bytes: Buffer): void => {
+  response.statusCode = 200;
+  response.setHeader('Content-Type', 'audio/midi');
+  response.setHeader('Content-Length', bytes.length);
+  response.setHeader('Cache-Control', 'no-store');
+  response.end(bytes);
 };
 
 const safeOriginalName = (header: string | undefined): string | null => {
@@ -124,7 +151,7 @@ export const createMidiUploadMiddleware = (
 
   if (request.method === 'GET' && pathname === MIDI_UPLOAD_ROUTE) {
     try {
-      sendJson(response, 200, { songs: await listStoredMidiFiles(uploadDirectory) });
+      sendJson(response, 200, { songs: [BUILT_IN_SONG, ...await listStoredMidiFiles(uploadDirectory)] });
     } catch {
       sendJson(response, 500, { error: 'The song library could not be read.' });
     }
@@ -133,17 +160,17 @@ export const createMidiUploadMiddleware = (
 
   if (request.method === 'GET') {
     const id = pathname.slice(`${MIDI_UPLOAD_ROUTE}/`.length);
+    if (id === BUILT_IN_SONG.id) {
+      sendMidi(response, builtInMidiBytes);
+      return;
+    }
     if (!storedIdPattern.test(id)) {
       sendJson(response, 404, { error: 'The saved MIDI file was not found.' });
       return;
     }
     try {
       const bytes = await readFile(path.join(uploadDirectory, id));
-      response.statusCode = 200;
-      response.setHeader('Content-Type', 'audio/midi');
-      response.setHeader('Content-Length', bytes.length);
-      response.setHeader('Cache-Control', 'no-store');
-      response.end(bytes);
+      sendMidi(response, bytes);
     } catch {
       sendJson(response, 404, { error: 'The saved MIDI file was not found.' });
     }
@@ -152,6 +179,10 @@ export const createMidiUploadMiddleware = (
 
   if (request.method === 'DELETE') {
     const id = pathname.slice(`${MIDI_UPLOAD_ROUTE}/`.length);
+    if (id === BUILT_IN_SONG.id) {
+      sendJson(response, 409, { error: 'The built-in demonstration song cannot be deleted.' });
+      return;
+    }
     if (!storedIdPattern.test(id)) {
       sendJson(response, 404, { error: 'The saved MIDI file was not found.' });
       return;
