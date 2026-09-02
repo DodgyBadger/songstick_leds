@@ -18,6 +18,7 @@ dist/
 coverage/
 *.log
 /web/src/generated/
+/var/
 
 # PlatformIO and embedded builds
 .pio/

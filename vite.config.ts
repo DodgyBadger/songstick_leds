@@ -1,8 +1,10 @@
 import { defineConfig } from 'vite';
+import { midiUploadPlugin } from './dev/midi-upload-plugin.ts';
 
 export default defineConfig({
   root: 'web',
   publicDir: 'public',
+  plugins: [midiUploadPlugin()],
   build: {
     outDir: '../dist',
     emptyOutDir: true,

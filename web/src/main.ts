@@ -9,6 +9,7 @@ import {
   type LedStripConfig,
   type LogicalLedFrame,
 } from './led-strip';
+import { loadSavedMidiFile, saveMidiFile } from './midi-file-client';
 
 type PlaybackStatus = 'stopped' | 'playing' | 'paused' | 'finished';
 
@@ -133,12 +134,12 @@ const summaryItem = (label: string, value: string): HTMLElement => {
   return item;
 };
 
-const renderImportResult = (filename: string, result: MidiImportResult): void => {
+const renderImportResult = (filename: string, storedId: string, result: MidiImportResult): void => {
   const summary = result.summary;
   importSummary.hidden = false;
   importStatus.textContent = result.success
-    ? `${filename} converted and loaded.`
-    : `${filename} could not be loaded.`;
+    ? `${filename} was saved as ${storedId}, converted, and loaded.`
+    : `${filename} was saved as ${storedId}, but could not be imported.`;
   importStatus.className = result.success ? 'import-status import-status--success' : 'import-status import-status--error';
 
   const pitchRange = summary.noteCount === 0
@@ -250,10 +251,12 @@ midiFileInput.addEventListener('change', async () => {
   const file = midiFileInput.files?.[0];
   if (!file) return;
   importStatus.className = 'import-status';
-  importStatus.textContent = `Reading ${file.name}…`;
+  importStatus.textContent = `Saving ${file.name}…`;
   try {
-    const result = playback.importMidi(new Uint8Array(await file.arrayBuffer()));
-    renderImportResult(file.name, result);
+    const stored = await saveMidiFile(file);
+    importStatus.textContent = `Loading saved file ${stored.id}…`;
+    const result = playback.importMidi(await loadSavedMidiFile(stored.id));
+    renderImportResult(file.name, stored.id, result);
   } catch (error) {
     importStatus.className = 'import-status import-status--error';
     importStatus.textContent = error instanceof Error ? error.message : 'The MIDI import failed unexpectedly.';

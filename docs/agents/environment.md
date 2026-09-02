@@ -34,6 +34,11 @@ installs for project tools.
 Do not commit `.venv`, `node_modules`, build output, secrets, or local `.env`
 files.
 
+MIDI files selected in the development simulator are stored beneath
+`var/midi-uploads/`. The entire `var/` runtime directory is ignored by Git. It is
+safe to inspect these files when diagnosing imports; do not depend on them as
+committed fixtures or production storage.
+
 ## Container and networking
 
 Development runs inside a Docker coding container. Public TLS and reverse proxy

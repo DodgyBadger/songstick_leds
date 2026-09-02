@@ -23,6 +23,10 @@ Run `npm run dev` for the strict `0.0.0.0:43173` development server and
 hostname is `songstick.dodgybadger.icu`; keep it in Vite's explicit allowed-host
 list rather than allowing arbitrary proxy hostnames.
 
-The current upload flow accepts monophonic Standard MIDI File format 0 and sends
-raw bytes to the C++/WASM importer. TypeScript may display returned summaries and
-diagnostics but must not parse MIDI, resolve tempo, or assign fingerings.
+The current development upload flow saves browser-selected MIDI files through a
+same-origin Vite endpoint under ignored `var/midi-uploads/`, loads those persisted
+bytes, and sends them to the C++/WASM importer. This endpoint is a development
+debugging adapter and is absent from a standalone static production build. Files
+remain on disk until removed by a developer; there is no retention UI yet.
+TypeScript may display returned summaries and diagnostics but must not parse
+MIDI, resolve tempo, or assign fingerings.
