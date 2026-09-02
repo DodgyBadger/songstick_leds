@@ -9,7 +9,13 @@ import {
   type LedStripConfig,
   type LogicalLedFrame,
 } from './led-strip';
-import { loadSavedMidiFile, saveMidiFile } from './midi-file-client';
+import {
+  deleteSavedMidiFile,
+  listSavedMidiFiles,
+  loadSavedMidiFile,
+  saveMidiFile,
+  type StoredMidiFile,
+} from './midi-file-client';
 
 type PlaybackStatus = 'stopped' | 'playing' | 'paused' | 'finished';
 
@@ -95,6 +101,8 @@ const importSummary = required<HTMLElement>('#import-summary');
 const importSummaryGrid = required<HTMLElement>('#import-summary-grid');
 const importDiagnostics = required<HTMLElement>('#import-diagnostics');
 const songLabel = required<HTMLElement>('#song-label');
+const songList = required<HTMLElement>('#song-list');
+const libraryStatus = required<HTMLElement>('#library-status');
 
 const module = (await createSongstickModule()) as SongstickModule;
 const playback = new module.Playback();
@@ -134,12 +142,12 @@ const summaryItem = (label: string, value: string): HTMLElement => {
   return item;
 };
 
-const renderImportResult = (filename: string, storedId: string, result: MidiImportResult): void => {
+const renderImportResult = (filename: string, result: MidiImportResult): void => {
   const summary = result.summary;
   importSummary.hidden = false;
   importStatus.textContent = result.success
-    ? `${filename} was saved as ${storedId}, converted, and loaded.`
-    : `${filename} was saved as ${storedId}, but could not be imported.`;
+    ? `${filename} was loaded and is playing.`
+    : `${filename} is stored, but could not be converted for playback.`;
   importStatus.className = result.success ? 'import-status import-status--success' : 'import-status import-status--error';
 
   const pitchRange = summary.noteCount === 0
@@ -175,7 +183,81 @@ const renderImportResult = (filename: string, storedId: string, result: MidiImpo
   if (result.success) {
     songLabel.textContent = summary.trackName || filename;
     speed.value = '750';
+    playback.play();
     render();
+  }
+};
+
+const formatFileSize = (bytes: number): string => bytes < 1024
+  ? `${bytes} bytes`
+  : `${(bytes / 1024).toFixed(1)} KiB`;
+
+const playSavedSong = async (song: StoredMidiFile): Promise<void> => {
+  importStatus.className = 'import-status';
+  importStatus.textContent = `Loading ${song.originalName}…`;
+  try {
+    renderImportResult(song.originalName, playback.importMidi(await loadSavedMidiFile(song.id)));
+  } catch (error) {
+    importStatus.className = 'import-status import-status--error';
+    importStatus.textContent = error instanceof Error ? error.message : 'The saved MIDI file could not be loaded.';
+  }
+};
+
+const renderSongLibrary = (songs: StoredMidiFile[]): void => {
+  if (songs.length === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'song-library__empty';
+    empty.textContent = 'No MIDI songs have been imported yet.';
+    songList.replaceChildren(empty);
+    return;
+  }
+
+  songList.replaceChildren(...songs.map((song) => {
+    const item = document.createElement('article');
+    item.className = 'song-item';
+    const details = document.createElement('div');
+    const title = document.createElement('strong');
+    title.textContent = song.originalName;
+    const metadata = document.createElement('small');
+    metadata.textContent = `${formatFileSize(song.size)} · imported ${new Date(song.uploadedAt).toLocaleString()}`;
+    details.append(title, metadata);
+
+    const actions = document.createElement('div');
+    actions.className = 'song-item__actions';
+    const playButton = document.createElement('button');
+    playButton.className = 'button button--primary';
+    playButton.type = 'button';
+    playButton.textContent = 'Play';
+    playButton.addEventListener('click', () => void playSavedSong(song));
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'button button--danger';
+    deleteButton.type = 'button';
+    deleteButton.textContent = 'Delete';
+    deleteButton.addEventListener('click', async () => {
+      if (!window.confirm(`Delete ${song.originalName}?`)) return;
+      try {
+        await deleteSavedMidiFile(song.id);
+        libraryStatus.textContent = `${song.originalName} was deleted.`;
+        await refreshSongLibrary();
+      } catch (error) {
+        libraryStatus.textContent = error instanceof Error ? error.message : 'The song could not be deleted.';
+      }
+    });
+    actions.append(playButton, deleteButton);
+    item.append(details, actions);
+    return item;
+  }));
+};
+
+const refreshSongLibrary = async (): Promise<void> => {
+  try {
+    const songs = await listSavedMidiFiles();
+    renderSongLibrary(songs);
+    if (!libraryStatus.textContent) {
+      libraryStatus.textContent = `${songs.length} ${songs.length === 1 ? 'song' : 'songs'} available.`;
+    }
+  } catch (error) {
+    libraryStatus.textContent = error instanceof Error ? error.message : 'The song library could not be loaded.';
   }
 };
 
@@ -254,9 +336,10 @@ midiFileInput.addEventListener('change', async () => {
   importStatus.textContent = `Saving ${file.name}…`;
   try {
     const stored = await saveMidiFile(file);
-    importStatus.textContent = `Loading saved file ${stored.id}…`;
-    const result = playback.importMidi(await loadSavedMidiFile(stored.id));
-    renderImportResult(file.name, stored.id, result);
+    importStatus.className = 'import-status import-status--success';
+    importStatus.textContent = `${stored.originalName} was imported into the song library.`;
+    libraryStatus.textContent = '';
+    await refreshSongLibrary();
   } catch (error) {
     importStatus.className = 'import-status import-status--error';
     importStatus.textContent = error instanceof Error ? error.message : 'The MIDI import failed unexpectedly.';
@@ -297,4 +380,5 @@ const update = (timestampMilliseconds: number): void => {
 
 window.addEventListener('pagehide', () => playback.delete(), { once: true });
 render();
+void refreshSongLibrary();
 requestAnimationFrame(update);

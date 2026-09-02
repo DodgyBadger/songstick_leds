@@ -20,7 +20,7 @@
         <div class="section-heading">
           <div>
             <p class="eyebrow">Format 0 · monophonic</p>
-            <h2 id="import-heading">Load a MIDI song</h2>
+            <h2 id="import-heading">Import a MIDI song</h2>
           </div>
           <label class="file-picker">
             <span>Choose MIDI file</span>
@@ -30,15 +30,25 @@
         <p class="profile-notice">
           Conversion currently assumes the provisional A-Mixolydian profile:
           A2–E3–A3 open strings, one shared open indicator, and 12 diatonic frets.
-          The saved file identifier is shown after each upload so failed files can be inspected.
         </p>
         <p id="import-status" class="import-status">
-          Choose a `.mid` or `.midi` file to save it in the development workspace and replace the demonstration song.
+          Choose a `.mid` or `.midi` file to add it to the song library.
         </p>
         <div id="import-summary" class="import-summary" hidden>
           <div id="import-summary-grid" class="import-summary__grid"></div>
           <ul id="import-diagnostics" class="diagnostics" hidden></ul>
         </div>
+      </section>
+
+      <section class="panel song-library" aria-labelledby="song-library-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Saved on this controller</p>
+            <h2 id="song-library-heading">Choose a song</h2>
+          </div>
+          <p id="library-status" class="library-status" aria-live="polite">Loading songs…</p>
+        </div>
+        <div id="song-list" class="song-list"></div>
       </section>
 
       <section class="panel playback-panel" aria-labelledby="playback-heading">

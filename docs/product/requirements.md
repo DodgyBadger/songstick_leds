@@ -1,8 +1,8 @@
 # Song Stick LED Teacher — Product Requirements Document
 
 **Status:** Initial draft
-**Version:** 0.4
-**Date:** 2026-08-06
+**Version:** 0.5
+**Date:** 2026-09-02
 **Project:** West End Maker Shed Song Stick
 **Development approach:** Simulation-first, shared portable C++ core
 
@@ -163,6 +163,33 @@ The ESP32 will receive a native build of the shared C++ sources. The WebAssembly
 The existing team repository may require another layout, but it must preserve the boundary between portable core and platform adapters.
 
 ## 8. Functional requirements
+
+### 8.0 Song library and selection
+
+Preparing songs and choosing a song to play are separate steps. A facilitator
+loads MIDI files onto the controller. The on-instrument screen presents all
+stored songs in a simple song selector for the player.
+
+The import action must:
+
+- accept filenames ending in `.mid` or `.midi`, case-insensitively;
+- reject other filename extensions;
+- persist accepted MIDI files so they remain available after the current screen
+  or browser session ends; and
+- update the song selector without requiring an application restart.
+
+The song selector must:
+
+- list every imported MIDI file using its original filename;
+- provide an explicit Play action that loads the stored file and begins playback;
+- provide a Delete action with confirmation before permanently removing a file;
+- show an empty-library state; and
+- report loading, playback-conversion, and deletion errors without removing the
+  stored source file.
+
+The browser simulator must exercise this workflow with development storage. The
+ESP32 filesystem, metadata representation, capacity, and provisioning transport
+remain separate platform decisions.
 
 ### 8.1 Instrument profile
 
@@ -484,6 +511,7 @@ rather than appearing as hardware decisions.
 Provide:
 
 - MIDI upload
+- Persistent song selector with Play and Delete actions
 - Song/import status
 - Song title
 - Play/Pause

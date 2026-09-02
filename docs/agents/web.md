@@ -27,6 +27,8 @@ The current development upload flow saves browser-selected MIDI files through a
 same-origin Vite endpoint under ignored `var/midi-uploads/`, loads those persisted
 bytes, and sends them to the C++/WASM importer. This endpoint is a development
 debugging adapter and is absent from a standalone static production build. Files
-remain on disk until removed by a developer; there is no retention UI yet.
+are catalogued using their original names. Import adds a file to the library;
+the separate song selector lists, plays, and deletes stored files. Delete must
+require confirmation.
 TypeScript may display returned summaries and diagnostics but must not parse
 MIDI, resolve tempo, or assign fingerings.

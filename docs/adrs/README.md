@@ -37,3 +37,4 @@ replace a changed decision with a new ADR that supersedes the old one.
 | [0003](0003-explicit-playable-position-profile.md) | Accepted | Convert pitch using explicit playable string/fret positions. |
 | [0004](0004-dedicated-shared-open-led.md) | Accepted | Use one configurable shared RGB LED for logical fret 0. |
 | [0005](0005-development-midi-storage.md) | Accepted | Keep disk-backed MIDI uploads in a development-server adapter outside the portable core. |
+| [0006](0006-platform-song-library-adapter.md) | Accepted | Keep song catalogs and persistence in platform adapters. |

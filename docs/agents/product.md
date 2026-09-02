@@ -14,6 +14,9 @@ Keep its assumptions distinct from confirmed facts.
 - An LED strip runs along the side of the song stick.
 - LEDs tell a learner which string and fret to play.
 - Songs will be loaded onto an ESP32 and selected by the learner.
+- Song import and song selection are separate steps. The selector lists stored
+  MIDI files and provides Play and confirmed Delete actions.
+- MIDI import accepts `.mid` and `.midi` filename extensions and rejects others.
 - A shareable browser simulator will support development and feedback without
   repeatedly flashing hardware.
 - The provisional simulator profile uses RGB, 12 frets, and one LED per fret.
@@ -27,7 +30,7 @@ Keep its assumptions distinct from confirmed facts.
 - Final physical fret count and LED index mapping
 - Tuning, note representation, chords, rhythm, and lesson progression
 - ESP32 board, LED chipset, controls, display, storage, and electrical design
-- Song authoring and file format
+- Song authoring and device-ready converted file format
 - Simulator appearance, interactions, and sharing workflow
 
 Update this document when the user confirms decisions. Clearly distinguish a

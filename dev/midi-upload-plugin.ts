@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, stat, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { Connect, Plugin } from 'vite';
@@ -7,11 +7,40 @@ import type { Connect, Plugin } from 'vite';
 export const MAXIMUM_MIDI_BYTES = 1024 * 1024;
 export const MIDI_UPLOAD_ROUTE = '/api/midi-files';
 
-interface StoredMidiFile {
+export interface StoredMidiFile {
   id: string;
   originalName: string;
   size: number;
+  uploadedAt: string;
 }
+
+const storedIdPattern = /^\d+-[0-9a-f-]{36}\.mid$/;
+const metadataPath = (uploadDirectory: string, id: string): string =>
+  path.join(uploadDirectory, `${id}.json`);
+
+const listStoredMidiFiles = async (uploadDirectory: string): Promise<StoredMidiFile[]> => {
+  await mkdir(uploadDirectory, { recursive: true });
+  const entries = await readdir(uploadDirectory);
+  const records = await Promise.all(entries.filter((entry) => storedIdPattern.test(entry)).map(async (id) => {
+    try {
+      const metadata = JSON.parse(await readFile(metadataPath(uploadDirectory, id), 'utf8')) as StoredMidiFile;
+      if (metadata.id === id && typeof metadata.originalName === 'string' &&
+          typeof metadata.size === 'number' && typeof metadata.uploadedAt === 'string') {
+        return metadata;
+      }
+    } catch {
+      // Files written before catalog metadata was introduced remain selectable.
+    }
+    const fileStat = await stat(path.join(uploadDirectory, id));
+    return {
+      id,
+      originalName: id,
+      size: fileStat.size,
+      uploadedAt: fileStat.mtime.toISOString(),
+    };
+  }));
+  return records.sort((left, right) => right.uploadedAt.localeCompare(left.uploadedAt));
+};
 
 const sendJson = (response: ServerResponse, status: number, body: unknown): void => {
   response.statusCode = status;
@@ -23,7 +52,9 @@ const sendJson = (response: ServerResponse, status: number, body: unknown): void
 const safeOriginalName = (header: string | undefined): string | null => {
   if (!header) return null;
   try {
-    const basename = path.basename(decodeURIComponent(header)).replace(/[^a-zA-Z0-9._ -]/g, '_');
+    const basename = path.basename(decodeURIComponent(header))
+      .replace(/[\u0000-\u001f\u007f]/g, '_')
+      .trim();
     if (!/\.(mid|midi)$/i.test(basename)) return null;
     return basename.slice(0, 120);
   } catch {
@@ -73,7 +104,13 @@ export const createMidiUploadMiddleware = (
       await mkdir(uploadDirectory, { recursive: true });
       const id = `${Date.now()}-${randomUUID()}.mid`;
       await writeFile(path.join(uploadDirectory, id), bytes, { flag: 'wx' });
-      const stored: StoredMidiFile = { id, originalName, size: bytes.length };
+      const stored: StoredMidiFile = {
+        id,
+        originalName,
+        size: bytes.length,
+        uploadedAt: new Date().toISOString(),
+      };
+      await writeFile(metadataPath(uploadDirectory, id), `${JSON.stringify(stored, null, 2)}\n`, { flag: 'wx' });
       sendJson(response, 201, stored);
     } catch (error) {
       if (error instanceof Error && error.message === 'UPLOAD_TOO_LARGE') {
@@ -85,9 +122,18 @@ export const createMidiUploadMiddleware = (
     return;
   }
 
+  if (request.method === 'GET' && pathname === MIDI_UPLOAD_ROUTE) {
+    try {
+      sendJson(response, 200, { songs: await listStoredMidiFiles(uploadDirectory) });
+    } catch {
+      sendJson(response, 500, { error: 'The song library could not be read.' });
+    }
+    return;
+  }
+
   if (request.method === 'GET') {
     const id = pathname.slice(`${MIDI_UPLOAD_ROUTE}/`.length);
-    if (!/^\d+-[0-9a-f-]{36}\.mid$/.test(id)) {
+    if (!storedIdPattern.test(id)) {
       sendJson(response, 404, { error: 'The saved MIDI file was not found.' });
       return;
     }
@@ -104,7 +150,25 @@ export const createMidiUploadMiddleware = (
     return;
   }
 
-  response.setHeader('Allow', 'GET, POST');
+  if (request.method === 'DELETE') {
+    const id = pathname.slice(`${MIDI_UPLOAD_ROUTE}/`.length);
+    if (!storedIdPattern.test(id)) {
+      sendJson(response, 404, { error: 'The saved MIDI file was not found.' });
+      return;
+    }
+    try {
+      await unlink(path.join(uploadDirectory, id));
+      await unlink(metadataPath(uploadDirectory, id)).catch(() => undefined);
+      response.statusCode = 204;
+      response.setHeader('Cache-Control', 'no-store');
+      response.end();
+    } catch {
+      sendJson(response, 404, { error: 'The saved MIDI file was not found.' });
+    }
+    return;
+  }
+
+  response.setHeader('Allow', 'GET, POST, DELETE');
   sendJson(response, 405, { error: 'Method not allowed.' });
 };
 

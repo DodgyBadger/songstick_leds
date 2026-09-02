@@ -36,3 +36,4 @@ link a follow-up plan instead of rewriting its history.
 | [0003](0003-format-zero-midi-import.md) | Completed | Import monophonic format-0 MIDI through C++/WASM and play it in the simulator. |
 | [0004](0004-open-string-indicator.md) | Completed | Add a shared RGB open-string position to fingering and strip simulation. |
 | [0005](0005-disk-backed-midi-upload.md) | Completed | Save browser-selected MIDI files to the development workspace before importing them. |
+| [0006](0006-song-selector.md) | Completed | Separate MIDI import from persistent song selection, playback, and deletion. |

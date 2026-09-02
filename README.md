@@ -49,13 +49,14 @@ the browser. Playback and logical LED snapshots remain authoritative C++/WASM
 output. The current screen is still an evolving simulator, not an approved
 touchscreen design.
 
-The simulator can also upload monophonic Standard MIDI File format 0. During
-development, uploads are saved under ignored `var/midi-uploads/` and reloaded
-from there before import, making failed files available for inspection. This
-storage endpoint exists only in the Vite development/preview server and is not
-part of the static build. Parsing, tempo resolution, validation, and provisional
-A-Mixolydian fingering all run in the portable C++ core. Format 1, polyphony
-reduction, and final instrument calibration remain future work. Current tuning assumptions are documented in
+The simulator can also import MIDI files into a persistent development song
+library under ignored `var/midi-uploads/`. The separate song selector lists the
+stored files and provides Play and confirmed Delete actions. Play reloads the
+saved bytes before passing them to the portable C++ core. This storage endpoint
+exists only in the Vite development/preview server and is not part of the static
+build. Parsing, tempo resolution, validation, and provisional A-Mixolydian
+fingering all run in the portable C++ core. Format 1, polyphony reduction, and
+final instrument calibration remain future work. Current tuning assumptions are documented in
 [`docs/product/provisional-instrument-profile.md`](docs/product/provisional-instrument-profile.md).
 
 See [AGENTS.md](AGENTS.md) for coding-agent guidance and
