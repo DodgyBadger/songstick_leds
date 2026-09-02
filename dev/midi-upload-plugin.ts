@@ -79,11 +79,13 @@ const sendMidi = (response: ServerResponse, bytes: Buffer): void => {
 const safeOriginalName = (header: string | undefined): string | null => {
   if (!header) return null;
   try {
-    const basename = path.basename(decodeURIComponent(header))
-      .replace(/[\u0000-\u001f\u007f]/g, '_')
-      .trim();
-    if (!/\.(mid|midi)$/i.test(basename)) return null;
-    return basename.slice(0, 120);
+    const filename = decodeURIComponent(header);
+    if (filename.length === 0 || filename.length > 255 ||
+        filename !== path.basename(filename) || filename.includes('\\') ||
+        /[\u0000-\u001f\u007f]/.test(filename) || !/\.(mid|midi)$/i.test(filename)) {
+      return null;
+    }
+    return filename;
   } catch {
     return null;
   }

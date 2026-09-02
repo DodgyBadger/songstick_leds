@@ -30,6 +30,9 @@ debugging adapter and is absent from a standalone static production build. Files
 are catalogued using their original names. Import adds a file to the library;
 the separate song selector lists, plays, and deletes stored files. Delete must
 require confirmation.
+Preserve the original import filename as catalog metadata; never show the opaque
+storage identifier as the normal song label. Keep each selector entry on one row
+with a compact round Play control on the left.
 The prototype catalog also includes a known-good built-in MIDI demonstration
 song. Mark it as built-in and do not offer Delete for it.
 TypeScript may display returned summaries and diagnostics but must not parse

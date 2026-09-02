@@ -218,6 +218,7 @@ const renderSongLibrary = (songs: StoredMidiFile[]): void => {
     const details = document.createElement('div');
     const title = document.createElement('strong');
     title.textContent = song.originalName;
+    title.title = song.originalName;
     if (song.builtIn) {
       const badge = document.createElement('span');
       badge.className = 'song-item__badge';
@@ -230,17 +231,17 @@ const renderSongLibrary = (songs: StoredMidiFile[]): void => {
       : `${formatFileSize(song.size)} · imported ${new Date(song.uploadedAt).toLocaleString()}`;
     details.append(title, metadata);
 
-    const actions = document.createElement('div');
-    actions.className = 'song-item__actions';
     const playButton = document.createElement('button');
-    playButton.className = 'button button--primary';
+    playButton.className = 'button button--primary song-item__play';
     playButton.type = 'button';
-    playButton.textContent = 'Play';
+    playButton.textContent = '▶';
+    playButton.setAttribute('aria-label', `Play ${song.originalName}`);
+    playButton.title = `Play ${song.originalName}`;
     playButton.addEventListener('click', () => void playSavedSong(song));
-    actions.append(playButton);
+    item.append(playButton, details);
     if (!song.builtIn) {
       const deleteButton = document.createElement('button');
-      deleteButton.className = 'button button--danger';
+      deleteButton.className = 'button button--danger song-item__delete';
       deleteButton.type = 'button';
       deleteButton.textContent = 'Delete';
       deleteButton.addEventListener('click', async () => {
@@ -253,9 +254,8 @@ const renderSongLibrary = (songs: StoredMidiFile[]): void => {
           libraryStatus.textContent = error instanceof Error ? error.message : 'The song could not be deleted.';
         }
       });
-      actions.append(deleteButton);
+      item.append(deleteButton);
     }
-    item.append(details, actions);
     return item;
   }));
 };

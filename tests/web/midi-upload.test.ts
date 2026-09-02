@@ -30,14 +30,15 @@ test('persists an uploaded MIDI file and serves the saved bytes', async () => {
     const address = server.address();
     assert(address && typeof address !== 'string');
     const baseUrl = `http://127.0.0.1:${address.port}`;
+    const originalName = 'Frère Jacques – take 1.MIDI';
     const upload = await fetch(`${baseUrl}${MIDI_UPLOAD_ROUTE}`, {
       method: 'POST',
-      headers: { 'X-Midi-Filename': encodeURIComponent('example tune.mid') },
+      headers: { 'X-Midi-Filename': encodeURIComponent(originalName) },
       body: midiBytes,
     });
     assert.equal(upload.status, 201);
     const record = await upload.json() as { id: string; originalName: string; size: number; uploadedAt: string };
-    assert.equal(record.originalName, 'example tune.mid');
+    assert.equal(record.originalName, originalName);
     assert.equal(record.size, midiBytes.length);
     assert(!Number.isNaN(Date.parse(record.uploadedAt)));
     assert.deepEqual(await readFile(path.join(uploadDirectory, record.id)), midiBytes);

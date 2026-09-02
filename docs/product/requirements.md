@@ -1,7 +1,7 @@
 # Song Stick LED Teacher — Product Requirements Document
 
 **Status:** Initial draft
-**Version:** 0.5
+**Version:** 0.6
 **Date:** 2026-09-02
 **Project:** West End Maker Shed Song Stick
 **Development approach:** Simulation-first, shared portable C++ core
@@ -182,6 +182,8 @@ The song selector must:
 
 - list every imported MIDI file using its original filename;
 - provide an explicit Play action that loads the stored file and begins playback;
+- place a compact, round Play control to the left of each song so selector rows
+  remain on one line;
 - provide a Delete action with confirmation before permanently removing a file;
 - show an empty-library state; and
 - report loading, playback-conversion, and deletion errors without removing the
