@@ -70,3 +70,9 @@ constraints are known.
   details are confirmed.
 - Consider compatibility status in catalog metadata when the import workflow can
   resolve format-1 tracks and other user decisions.
+
+## Follow-up update: 2026-09-16
+
+[ADR 0008](0008-browser-local-demo-storage.md) replaces the browser adapter's
+development filesystem and HTTP implementation with IndexedDB for the static
+public demo. The platform-owned catalog boundary decided here remains unchanged.

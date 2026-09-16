@@ -1,8 +1,8 @@
 # Song Stick LED Teacher — Product Requirements Document
 
 **Status:** Initial draft
-**Version:** 0.8
-**Date:** 2026-09-02
+**Version:** 0.9
+**Date:** 2026-09-16
 **Project:** West End Maker Shed Song Stick
 **Development approach:** Simulation-first, shared portable C++ core
 
@@ -189,9 +189,11 @@ The song selector must:
 - report loading, playback-conversion, and deletion errors without removing the
   stored source file.
 
-The browser simulator must exercise this workflow with development storage. The
-ESP32 filesystem, metadata representation, capacity, and provisioning transport
-remain separate platform decisions.
+The shareable browser simulator must exercise this workflow as a static site.
+Imported files and catalog metadata persist in IndexedDB for that browser origin
+and are not uploaded or shared with other visitors. Clearing site data removes
+imported songs. The ESP32 filesystem, metadata representation, capacity, and
+provisioning transport remain separate platform decisions.
 
 For the prototype, the selector must always include a playable built-in test
 song. It must be visibly distinguished from imported songs and cannot be

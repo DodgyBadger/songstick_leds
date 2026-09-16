@@ -34,10 +34,9 @@ installs for project tools.
 Do not commit `.venv`, `node_modules`, build output, secrets, or local `.env`
 files.
 
-MIDI files selected in the development simulator are stored beneath
-`var/midi-uploads/`. The entire `var/` runtime directory is ignored by Git. It is
-safe to inspect these files when diagnosing imports; do not depend on them as
-committed fixtures or production storage.
+MIDI files selected in the simulator are stored in IndexedDB for the site's
+browser origin. They are not written into this workspace. Ask a tester to share
+the original file when diagnosing an import that cannot be reproduced locally.
 
 ## Container and networking
 

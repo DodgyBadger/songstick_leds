@@ -19,15 +19,15 @@ an implementation plan. Any development server must follow the networking rules
 in `environment.md`.
 
 Run `npm run dev` for the strict `0.0.0.0:43173` development server and
-`npm run build` for the static production output. The stable shared development
+`npm run build` for the static production output. Set `VITE_BASE_PATH` when the
+static host serves the application below an origin path. The stable shared development
 hostname is `songstick.dodgybadger.icu`; keep it in Vite's explicit allowed-host
 list rather than allowing arbitrary proxy hostnames.
 
-The current development upload flow saves browser-selected MIDI files through a
-same-origin Vite endpoint under ignored `var/midi-uploads/`, loads those persisted
-bytes, and sends them to the C++/WASM importer. This endpoint is a development
-debugging adapter and is absent from a standalone static production build. Files
-are catalogued using their original names. Import adds a file to the library;
+The simulator saves browser-selected MIDI files and catalog metadata in
+per-origin IndexedDB, loads those persisted bytes, and sends them to the
+C++/WASM importer. Files never need to leave the visitor's browser and clearing
+site data removes imported songs. Files are catalogued using their original names. Import adds a file to the library;
 the separate song selector lists, plays, and deletes stored files. Delete must
 require confirmation.
 Preserve the original import filename as catalog metadata; never show the opaque

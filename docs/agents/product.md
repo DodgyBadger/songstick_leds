@@ -24,6 +24,8 @@ Keep its assumptions distinct from confirmed facts.
   only Player exposes transport and tempo controls.
 - A shareable browser simulator will support development and feedback without
   repeatedly flashing hardware.
+- The shareable interface demo is a static site. Imported MIDI files persist only
+  in each visitor's browser and are not shared with the team or other visitors.
 - The provisional simulator profile uses RGB, 12 frets, and one LED per fret.
 - One shared RGB LED at the nut represents logical fret 0; color identifies the
   open string.
@@ -36,7 +38,7 @@ Keep its assumptions distinct from confirmed facts.
 - Tuning, note representation, chords, rhythm, and lesson progression
 - ESP32 board, LED chipset, controls, display, storage, and electrical design
 - Song authoring and device-ready converted file format
-- Simulator appearance, interactions, and sharing workflow
+- Final simulator appearance and interactions
 
 Update this document when the user confirms decisions. Clearly distinguish a
 confirmed requirement from an implementation choice or temporary assumption.

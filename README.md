@@ -52,15 +52,26 @@ touchscreen design.
 The simulator models a small instrument touchscreen above the virtual LED strip,
 with separate Songs, Player, and Manage screens. Selecting a stored song opens
 Player, where Play/Pause, Restart, progress, and tempo controls live. Manage
-imports MIDI files into a persistent development library under ignored
-`var/midi-uploads/` and provides confirmed deletion. A non-deletable built-in
-demo is always available. Selecting a song reloads its saved bytes before
-passing them to the portable C++ core. This storage endpoint
-exists only in the Vite development/preview server and is not part of the static
-build. Parsing, tempo resolution, validation, and provisional A-Mixolydian
+imports MIDI files into browser-local IndexedDB and provides confirmed deletion.
+Imports stay on the visitor's device and persist across browser sessions unless
+site data is cleared. A non-deletable built-in demo is always available.
+Selecting a song reloads its saved bytes before passing them to the portable C++
+core. Parsing, tempo resolution, validation, and provisional A-Mixolydian
 fingering all run in the portable C++ core. Format 1, polyphony reduction, and
 final instrument calibration remain future work. Current tuning assumptions are documented in
 [`docs/product/provisional-instrument-profile.md`](docs/product/provisional-instrument-profile.md).
+
+## Publish the browser demo
+
+The static build is ready for GitHub Pages. In the GitHub repository, choose
+**Settings → Pages → Build and deployment → GitHub Actions** once. Pushes to
+`main` then run the pinned Node 22 and Emscripten 6.0.6 build and publish `dist/`
+at `https://<owner>.github.io/songstick_leds/`. The workflow can also be run
+manually from the Actions tab.
+
+The default workflow base path targets the repository URL above. Adjust
+`VITE_BASE_PATH` in `.github/workflows/deploy-pages.yml` if the repository is
+renamed or the site moves to a root custom domain.
 
 See [AGENTS.md](AGENTS.md) for coding-agent guidance and
 [docs/agents/environment.md](docs/agents/environment.md) for environment details.

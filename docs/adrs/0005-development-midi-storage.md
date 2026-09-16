@@ -1,11 +1,11 @@
 # ADR 0005: Keep development MIDI storage outside the portable core
 
-- **Status:** Accepted
+- **Status:** Superseded
 - **Date:** 2026-09-02
 - **Deciders:** Development team
 - **Related plans:** [Plan 0005](../plans/0005-disk-backed-midi-upload.md)
 - **Supersedes:** None
-- **Superseded by:** None
+- **Superseded by:** [ADR 0008](0008-browser-local-demo-storage.md)
 
 ## Context
 

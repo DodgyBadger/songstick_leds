@@ -1,6 +1,6 @@
 import createSongstickModule from '../../build/wasm/songstick.js';
 import { readFile } from 'node:fs/promises';
-import { builtInMidiBytes } from '../../dev/midi-upload-plugin.ts';
+import { builtInMidiBytes } from '../../web/src/midi-file-client.ts';
 
 const wasmBinary = await readFile(new URL('../../build/wasm/songstick.wasm', import.meta.url));
 const module = await createSongstickModule({ wasmBinary });
