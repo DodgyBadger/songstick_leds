@@ -40,11 +40,11 @@ the original file when diagnosing an import that cannot be reproduced locally.
 
 ## Container and networking
 
-Development runs inside a Docker coding container. Public TLS and reverse proxy
-configuration belong to Caddy on the real host, not in this repository unless a
-later task explicitly adds an example. Web development servers must bind to
-`0.0.0.0`, use an explicitly selected non-standard port, and fail rather than
-silently moving to another port.
+Development runs inside a Docker coding container. The public demo is deployed
+as a static GitHub Pages site; no development-server proxy configuration belongs
+in this repository. Web development servers must bind to `0.0.0.0`, use an
+explicitly selected non-standard port, and fail rather than silently moving to
+another port.
 
 Native and WebAssembly compilers are provided by the container image, not
 downloaded by repository bootstrap. `emcc` and `emcmake` must resolve without

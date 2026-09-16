@@ -20,9 +20,8 @@ in `environment.md`.
 
 Run `npm run dev` for the strict `0.0.0.0:43173` development server and
 `npm run build` for the static production output. Set `VITE_BASE_PATH` when the
-static host serves the application below an origin path. The stable shared development
-hostname is `songstick.dodgybadger.icu`; keep it in Vite's explicit allowed-host
-list rather than allowing arbitrary proxy hostnames.
+static host serves the application below an origin path. The development server
+uses Vite's default host checks; do not allow arbitrary proxy hostnames.
 
 The simulator saves browser-selected MIDI files and catalog metadata in
 per-origin IndexedDB, loads those persisted bytes, and sends them to the

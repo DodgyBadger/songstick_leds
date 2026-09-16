@@ -2,6 +2,16 @@
 .env
 .env.*
 !.env.example
+.npmrc
+.netrc
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
 .claude/settings.local.json
 
 # Python and uv
@@ -18,6 +28,7 @@ dist/
 coverage/
 *.log
 /web/src/generated/
+/var/
 
 # PlatformIO and embedded builds
 .pio/
